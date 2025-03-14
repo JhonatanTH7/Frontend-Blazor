@@ -1,22 +1,23 @@
-<!--  Define la ruta URL para acceder a esta página (será accesible en /productos)-->
-@page "/productos"  
+<!--  Define la ruta URL para acceder a esta página -->
+@page "/productos"
 <!--  Importa el espacio de nombres para trabajar con listas y colecciones -->
-@using System.Collections.Generic  
-@using System.Text.Json  
+@using System.Collections.Generic
+@using System.Text.Json
 <!--  Importa el espacio de nombres para trabajar con JSON -->
-@using Services  
+@using Services
 <!--  Importa el espacio de nombres donde se encuentra el ServicioEntidad-->
-@inject ServicioEntidad servicioEntidad  
+@inject ServicioEntidad servicioEntidad
 <!--  Inyecta el servicio que se comunicará con la API ServicioEntidad -->
-@inject NavigationManager navegacionManager  
+@inject NavigationManager navegacionManager
 <!--  Inyecta el servicio para manejar la navegación entre páginas ServicioEntidad-->
 
-<PageTitle>Lista de Productos</PageTitle>  <!-- Define el título que se mostrará en la pestaña del navegador -->
+<PageTitle>Lista de Productos</PageTitle> <!-- Define el título que se mostrará en la pestaña del navegador -->
 
-<h1>Productos</h1>  <!-- Encabezado principal de la página -->
+<h1>Productos</h1> <!-- Encabezado principal de la página -->
 
-<div class="mb-3">  <!-- Contenedor con margen inferior (mb-3 es una clase de Bootstrap) -->
-    <button class="btn btn-primary" disabled>Crear Nuevo (Próximamente)</button>  <!-- Botón deshabilitado para crear nuevos productos -->
+<div class="mb-3"> <!-- Contenedor con margen inferior (mb-3 es una clase de Bootstrap) -->
+    <button class="btn btn-primary" disabled>Crear Nuevo (Próximamente)</button>
+    <!-- Botón deshabilitado para crear nuevos productos -->
 </div>
 
 <!-- Bloque condicional que muestra un indicador de carga si los datos están cargando -->
@@ -24,33 +25,37 @@
 <!-- Si hay productos para mostrar, muestra la tabla -->
 @if (cargando)
 {
-    <p><em>Cargando...</em></p>  <!-- Mensaje de carga con énfasis (cursiva) -->
+    <p><em>Cargando...</em></p> <!-- Mensaje de carga con énfasis (cursiva) -->
 }
 else if (productos == null || productos.Count == 0)
 {
-    <p>No hay productos disponibles.</p>  <!-- Mensaje cuando no hay productos para mostrar -->
+    <p>No hay productos disponibles.</p> <!-- Mensaje cuando no hay productos para mostrar -->
 }
 else
 {
-    <div class="table-responsive">  <!-- Contenedor que hace que la tabla sea responsive (se pueda desplazar horizontalmente en dispositivos pequeños) -->
-        <table class="table table-striped">  <!-- Tabla con estilos de Bootstrap (filas alternas sombreadas) -->
-            <thead>  <!-- Encabezado de la tabla -->
-                <tr>  <!-- Fila del encabezado -->
-                    <th>Código</th>  <!-- Columna para el código del producto -->
-                    <th>Nombre</th>  <!-- Columna para el nombre del producto -->
-                    <th>Stock</th>  <!-- Columna para el stock disponible -->
-                    <th>Valor Unitario</th>  <!-- Columna para el precio unitario -->
+    <div class="table-responsive">
+        <!-- Contenedor que hace que la tabla sea responsive (se pueda desplazar horizontalmente en dispositivos pequeños) -->
+        <table class="table table-striped"> <!-- Tabla con estilos de Bootstrap (filas alternas sombreadas) -->
+            <thead> <!-- Encabezado de la tabla -->
+                <tr> <!-- Fila del encabezado -->
+                    <th>Código</th> <!-- Columna para el código del producto -->
+                    <th>Nombre</th> <!-- Columna para el nombre del producto -->
+                    <th>Stock</th> <!-- Columna para el stock disponible -->
+                    <th>Valor Unitario</th> <!-- Columna para el precio unitario -->
                 </tr>
             </thead>
-            <tbody>  <!-- Cuerpo de la tabla donde se muestran los datos -->
+            <tbody> <!-- Cuerpo de la tabla donde se muestran los datos -->
                 <!-- Bucle foreach que itera sobre cada producto en la lista -->
                 @foreach (var producto in productos)
                 {
-                    <tr>  <!-- Fila para cada producto -->
-                        <td>@ObtenerValor(producto, "codigo")</td>  <!-- Celda que muestra el código usando el método auxiliar -->
-                        <td>@ObtenerValor(producto, "nombre")</td>  <!-- Celda que muestra el nombre usando el método auxiliar -->
-                        <td>@ObtenerValor(producto, "stock")</td>  <!-- Celda que muestra el stock usando el método auxiliar -->
-                        <td>@FormatearPrecio(ObtenerValor(producto, "valorunitario"))</td>  <!-- Celda que muestra el precio formateado -->
+                    <tr> <!-- Fila para cada producto -->
+                        <td>@ObtenerValor(producto, "codigo")</td>
+                        <!-- Celda que muestra el código usando el método auxiliar -->
+                        <td>@ObtenerValor(producto, "nombre")</td>
+                        <!-- Celda que muestra el nombre usando el método auxiliar -->
+                        <td>@ObtenerValor(producto, "stock")</td> <!-- Celda que muestra el stock usando el método auxiliar -->
+                        <td>@FormatearPrecio(ObtenerValor(producto, "valorunitario"))</td>
+                        <!-- Celda que muestra el precio formateado -->
                     </tr>
                 }
             </tbody>
@@ -69,13 +74,13 @@ else
 @code {
     // Lista para almacenar los productos que se obtienen de la API
     private List<Dictionary<string, object>> productos = new List<Dictionary<string, object>>();
-    
+
     // Bandera para indicar si se están cargando los datos
     private bool cargando = true;
-    
+
     // Variable para almacenar mensajes de error
     private string? errorMensaje = null;
-    
+
     // Constantes para los parámetros de la API
     private const string PROYECTO = "proyecto";
     private const string TABLA = "fuente";
@@ -94,12 +99,12 @@ else
         cargando = true;
         // Limpiar cualquier mensaje de error previo
         errorMensaje = null;
-        
+
         try
         {
             // Obtener todos los productos usando el servicio de entidades
             var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, TABLA);
-            
+
             // Si la lista no es null, asignarla a la variable productos
             if (resultado != null)
             {
@@ -130,14 +135,14 @@ else
         // Verificar si el diccionario es null
         if (diccionario == null)
             return string.Empty;
-            
+
         // Verificar si el diccionario contiene la clave
         if (diccionario.TryGetValue(clave, out var valor))
         {
             // Devolver el valor como cadena, o cadena vacía si es null
             return valor?.ToString() ?? string.Empty;
         }
-        
+
         // Si la clave no existe, devolver cadena vacía
         return string.Empty;
     }
@@ -148,14 +153,14 @@ else
         // Verificar si la cadena está vacía
         if (string.IsNullOrEmpty(valor))
             return "$0.00";
-            
+
         // Intentar convertir el valor a decimal
         if (decimal.TryParse(valor, out decimal precio))
         {
             // Formatear como moneda con el símbolo $ y dos decimales
             return precio.ToString("C");
         }
-        
+
         // Si no se puede convertir, devolver el valor original
         return valor;
     }

@@ -1,0 +1,137 @@
+<!--  Define la ruta URL para acceder a esta página -->
+@page "/seccion"
+
+<!--  Importa el espacio de nombres para trabajar con JSON -->
+@using Services
+
+<!--  Importa el espacio de nombres donde se encuentra el ServicioEntidad-->
+@inject ServicioEntidad servicioEntidad
+
+<PageTitle>Secciones</PageTitle>
+
+<h1>Secciones</h1> <!-- Encabezado principal de la página -->
+
+<div class="mb-3"> <!-- Contenedor con margen inferior (mb-3 es una clase de Bootstrap) -->
+    <button class="btn btn-primary">Listar</button>
+    <button class="btn btn-primary">Consultar</button>
+    <button class="btn btn-success">Crear</button>
+    <button class="btn btn-warning">Actualizar</button>
+    <button class="btn btn-danger">Eliminar</button>
+</div>
+
+
+@if (cargando)
+{
+    <p><em>Cargando...</em></p> <!-- Mensaje de carga con énfasis (cursiva) -->
+}
+else if (secciones == null || secciones.Count == 0)
+{
+    <p>No hay secciones disponibles.</p> <!-- Mensaje cuando no hay secciones para mostrar -->
+}
+else
+{
+    <div class="table-responsive">
+        <!-- Contenedor que hace que la tabla sea responsive (se pueda desplazar horizontalmente en dispositivos pequeños) -->
+        <table class="table table-striped"> <!-- Tabla con estilos de Bootstrap (filas alternas sombreadas) -->
+            <thead> <!-- Encabezado de la tabla -->
+                <tr> <!-- Fila del encabezado -->
+                    <th>Código</th> <!-- Columna para el código del seccion -->
+                    <th>Nombre</th> <!-- Columna para el nombre del seccion -->
+                </tr>
+            </thead>
+            <tbody> <!-- Cuerpo de la tabla donde se muestran los datos -->
+                <!-- Bucle foreach que itera sobre cada seccion en la lista -->
+                @foreach (var seccion in secciones)
+                {
+                    <tr> <!-- Fila para cada seccion -->
+                        <td>@ObtenerValor(seccion, "id")</td>
+                        <!-- Celda que muestra el código usando el método auxiliar -->
+                        <td>@ObtenerValor(seccion, "nombre")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+
+@code {
+
+    // Lista para almacenar los productos que se obtienen de la API
+    private List<Dictionary<string, object>> secciones = new List<Dictionary<string, object>>();
+
+    private bool cargando = true; // Indicador de carga
+
+    // Variable para almacenar mensajes de error
+    private string? errorMensaje = null;
+
+    // Constantes para los parámetros de la API
+    private const string PROYECTO = "proyecto";
+
+    private const string TABLA = "seccion";
+
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Llamar al método para cargar los secciones
+        await CargarSecciones();
+    }
+
+    // Método asíncrono para cargar los secciones desde la API
+    private async Task CargarSecciones()
+    {
+        // Establecer la bandera de carga en verdadero
+        cargando = true;
+        // Limpiar cualquier mensaje de error previo
+        errorMensaje = null;
+
+        try
+        {
+            // Obtener todos los secciones usando el servicio de entidades
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, TABLA);
+
+            // Si la lista no es null, asignarla a la variable secciones
+            if (resultado != null)
+            {
+                secciones = resultado;
+            }
+            else
+            {
+                // Si es null, inicializar como lista vacía para evitar errores
+                secciones = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            // En caso de error, guardar el mensaje y crear lista vacía
+            errorMensaje = $"Error al cargar secciones: {ex.Message}";
+            secciones = new List<Dictionary<string, object>>();
+        }
+        finally
+        {
+            // Establecer la bandera de carga en falso una vez finalizada la operación
+            cargando = false;
+        }
+    }
+
+    private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
+    {
+        // Verificar si el diccionario es null
+        if (diccionario == null)
+            return string.Empty;
+
+        // Verificar si el diccionario contiene la clave
+        if (diccionario.TryGetValue(clave, out var valor))
+        {
+            // Devolver el valor como cadena, o cadena vacía si es null
+            return valor?.ToString() ?? string.Empty;
+        }
+
+        // Si la clave no existe, devolver cadena vacía
+        return string.Empty;
+    }
+
+}
