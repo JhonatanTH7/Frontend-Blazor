@@ -7,50 +7,89 @@
 <!--  Importa el espacio de nombres donde se encuentra el ServicioEntidad-->
 @inject ServicioEntidad servicioEntidad
 
-<PageTitle>Secciones</PageTitle>
+<PageTitle>Seccion</PageTitle>
 
-<h1>Secciones</h1> <!-- Encabezado principal de la página -->
+<h1>Seccion</h1>
 
-<div class="mb-3"> <!-- Contenedor con margen inferior (mb-3 es una clase de Bootstrap) -->
-    <button class="btn btn-primary">Listar</button>
-    <button class="btn btn-primary">Consultar</button>
-    <button class="btn btn-success">Crear</button>
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="ManejarClickListar">Listar</button>
+    <button class="btn btn-primary" @onclick="ManejarClickConsultar">Consultar</button>
+    <button class="btn btn-success" @onclick="ManejarClickCrear">Crear</button>
     <button class="btn btn-warning">Actualizar</button>
     <button class="btn btn-danger">Eliminar</button>
 </div>
 
 
-@if (cargando)
+@if (Cargando)
 {
-    <p><em>Cargando...</em></p> <!-- Mensaje de carga con énfasis (cursiva) -->
-}
-else if (secciones == null || secciones.Count == 0)
-{
-    <p>No hay secciones disponibles.</p> <!-- Mensaje cuando no hay secciones para mostrar -->
+    <p><em>Cargando...</em></p>
 }
 else
 {
-    <div class="table-responsive">
-        <!-- Contenedor que hace que la tabla sea responsive (se pueda desplazar horizontalmente en dispositivos pequeños) -->
-        <table class="table table-striped"> <!-- Tabla con estilos de Bootstrap (filas alternas sombreadas) -->
-            <thead> <!-- Encabezado de la tabla -->
-                <tr> <!-- Fila del encabezado -->
-                    <th>Código</th> <!-- Columna para el código del seccion -->
-                    <th>Nombre</th> <!-- Columna para el nombre del seccion -->
-                </tr>
-            </thead>
-            <tbody> <!-- Cuerpo de la tabla donde se muestran los datos -->
-                <!-- Bucle foreach que itera sobre cada seccion en la lista -->
-                @foreach (var seccion in secciones)
-                {
-                    <tr> <!-- Fila para cada seccion -->
-                        <td>@ObtenerValor(seccion, "id")</td>
-                        <!-- Celda que muestra el código usando el método auxiliar -->
-                        <td>@ObtenerValor(seccion, "nombre")</td>
+    @if (VisFormCrear)
+    {
+        <EditForm Model="@formulario" OnValidSubmit="Crear">
+            <div class="mb-3">
+                <label for="idCrear">Código:</label>
+                <input type="number" class="form-control" @bind="formulario.Codigo" id="idCrear" />
+            </div>
+
+            <div class="mb-3">
+                <label for="nombreCrear">Nombre:</label>
+                <input type="text" class="form-control" @bind="formulario.Nombre" id="nombreCrear" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </EditForm>
+    }
+
+    @if (VisFormConsultar)
+    {
+        <EditForm Model="@formulario" OnValidSubmit="Consultar">
+            <div class="mb-3">
+                <label for="idConsultar">Código:</label>
+                <input type="number" class="form-control" @bind="formulario.Codigo" id="idConsultar" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </EditForm>
+    }
+
+    @if (CargarTabla && secciones != null && secciones.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var seccion in secciones)
+                    {
+                        <tr>
+                            <td>@ObtenerValor(seccion, "id")</td>
+                            <td>@ObtenerValor(seccion, "nombre")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if ((secciones == null || secciones.Count == 0) && CargarTabla)
+    {
+        <p>No hay secciones disponibles.</p>
+    }
+
+
+}
+
+<!-- Mostrar mensaje de error si existe -->
+@if (errorMensaje != null)
+{
+    <div class="alert alert-danger">
+        Error: @errorMensaje
     </div>
 }
 
@@ -60,7 +99,7 @@ else
     // Lista para almacenar los productos que se obtienen de la API
     private List<Dictionary<string, object>> secciones = new List<Dictionary<string, object>>();
 
-    private bool cargando = true; // Indicador de carga
+    private FormularioSeccion formulario = new FormularioSeccion();
 
     // Variable para almacenar mensajes de error
     private string? errorMensaje = null;
@@ -71,66 +110,136 @@ else
     private const string TABLA = "seccion";
 
 
-
+    // Variables visibilidad
+    private bool Cargando = true;
+    private bool CargarTabla = false;
+    private bool VisFormCrear = false;
+    private bool VisFormConsultar = false;
 
 
     protected override async Task OnInitializedAsync()
     {
-        // Llamar al método para cargar los secciones
         await CargarSecciones();
     }
 
-    // Método asíncrono para cargar los secciones desde la API
+
+    private class FormularioSeccion
+    {
+        public string Codigo { get; set; } = "";
+        public string Nombre { get; set; } = "";
+    }
+
+    private void Crear()
+    {
+        Console.WriteLine($"Código: {formulario.Codigo}, Nombre: {formulario.Nombre}");
+    }
+
+    private void Consultar()
+    {
+        Console.WriteLine($"Código: {formulario.Codigo}");
+    }
+
+    private async Task ManejarClickListar()
+    {
+        formulario = new FormularioSeccion();
+        CargarTabla = true;
+        VisFormConsultar = false;
+        VisFormCrear = false;
+        await CargarSecciones();
+    }
+
+    private void ManejarClickCrear()
+    {
+        formulario = new FormularioSeccion();
+        VisFormCrear = true;
+        VisFormConsultar = false;
+        CargarTabla = false;
+    }
+
+
+    private void ManejarClickConsultar()
+    {
+        VisFormConsultar = true;
+        VisFormCrear = false;
+        CargarTabla = false;
+    }
+
+
     private async Task CargarSecciones()
     {
-        // Establecer la bandera de carga en verdadero
-        cargando = true;
-        // Limpiar cualquier mensaje de error previo
+        Cargando = true;
         errorMensaje = null;
 
         try
         {
-            // Obtener todos los secciones usando el servicio de entidades
             var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, TABLA);
-
-            // Si la lista no es null, asignarla a la variable secciones
             if (resultado != null)
             {
                 secciones = resultado;
             }
             else
             {
-                // Si es null, inicializar como lista vacía para evitar errores
                 secciones = new List<Dictionary<string, object>>();
             }
         }
         catch (Exception ex)
         {
-            // En caso de error, guardar el mensaje y crear lista vacía
             errorMensaje = $"Error al cargar secciones: {ex.Message}";
             secciones = new List<Dictionary<string, object>>();
         }
         finally
         {
-            // Establecer la bandera de carga en falso una vez finalizada la operación
-            cargando = false;
+            CargarTabla = true;
+            Cargando = false;
+        }
+    }
+
+    private async Task CargarSeccionPorClave()
+    {
+        Cargando = true;
+
+        errorMensaje = null;
+
+        VisFormConsultar = true;
+
+        try
+        {
+
+            var resultado = await servicioEntidad.ObtenerPorClaveAsync(PROYECTO, TABLA, "id", "0");
+
+            if (resultado != null)
+            {
+                secciones = new List<Dictionary<string, object>>() { resultado };
+            }
+            else
+            {
+
+                secciones = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+
+            errorMensaje = $"Error al cargar seccion: {ex.Message}";
+            secciones = new List<Dictionary<string, object>>();
+        }
+        finally
+        {
+            Cargando = false;
         }
     }
 
     private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
     {
-        // Verificar si el diccionario es null
+
         if (diccionario == null)
             return string.Empty;
 
-        // Verificar si el diccionario contiene la clave
         if (diccionario.TryGetValue(clave, out var valor))
         {
-            // Devolver el valor como cadena, o cadena vacía si es null
             return valor?.ToString() ?? string.Empty;
         }
 
-        // Si la clave no existe, devolver cadena vacía
         return string.Empty;
     }
 

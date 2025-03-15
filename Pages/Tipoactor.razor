@@ -1,1 +1,19 @@
 @page "/tipoactor"
+
+<!--  Importa el espacio de nombres para trabajar con JSON -->
+@using Services
+
+<!--  Importa el espacio de nombres donde se encuentra el ServicioEntidad-->
+@inject ServicioEntidad servicioEntidad
+
+<PageTitle>TipoActor</PageTitle>
+
+<h1>TipoActor</h1>
+
+<div class="mb-3">
+    <button class="btn btn-primary">Listar</button>
+    <button class="btn btn-primary">Consultar</button>
+    <button class="btn btn-success">Crear</button>
+    <button class="btn btn-warning">Actualizar</button>
+    <button class="btn btn-danger">Eliminar</button>
+</div>

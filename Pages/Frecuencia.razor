@@ -1,2 +1,20 @@
 <!--  Define la ruta URL para acceder a esta página -->
 @page "/frecuencia"  
+
+<!--  Importa el espacio de nombres para trabajar con JSON -->
+@using Services
+
+<!--  Importa el espacio de nombres donde se encuentra el ServicioEntidad-->
+@inject ServicioEntidad servicioEntidad
+
+<PageTitle>Frecuencia</PageTitle>
+
+<h1>Frecuencia</h1>
+
+<div class="mb-3">
+    <button class="btn btn-primary">Listar</button>
+    <button class="btn btn-primary">Consultar</button>
+    <button class="btn btn-success">Crear</button>
+    <button class="btn btn-warning">Actualizar</button>
+    <button class="btn btn-danger">Eliminar</button>
+</div>
