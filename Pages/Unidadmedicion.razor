@@ -78,8 +78,9 @@ else
                     {
                         <tr>
                             <td>@ObtenerValor(seccion, "id")</td>
-                            <td>@ObtenerValor(seccion, "nombre")</td>
+                            <td>@ObtenerValor(seccion, "descripcion")</td>
                         </tr>
+
                     }
                 </tbody>
             </table>
@@ -374,18 +375,30 @@ formulario.Nombre }});
         }
     }
 
-    private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
-    {
 
+
+   /* private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
+    {
         if (diccionario == null)
             return string.Empty;
 
-        if (diccionario.TryGetValue(clave, out var valor))
-        {
-            return valor?.ToString() ?? string.Empty;
-        }
+        var entrada = diccionario.FirstOrDefault(kv => kv.Key.Equals(clave, StringComparison.OrdinalIgnoreCase));
+        return entrada.Value?.ToString() ?? string.Empty;
+    }*/
 
-        return string.Empty;
+
+     private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
+    {
+
+    if (diccionario == null)
+    return string.Empty;
+
+    if (diccionario.TryGetValue(clave, out var valor))
+    {
+    return valor?.ToString() ?? string.Empty;
+    }
+
+    return string.Empty;
     }
 
 }
