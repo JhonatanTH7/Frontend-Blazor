@@ -41,10 +41,10 @@ else
             }
             else if (VisFormActualizar)
             {
-               <button type="button" class="btn btn-warning me-3" @onclick="ActualizarSeccion">Actualizar registro</button>
+                <button type="button" class="btn btn-warning me-3" @onclick="ActualizarSeccion">Actualizar registro</button>
                 <div class="mb-3">
-                    <label for="newpassword">Nuevo password:</label>
-                    <input type="text" class="form-control" @bind="formulario.contrasena" id="newpassword" />
+                    <label for="nombreActualizar">Nueva contraseña:</label>
+                    <input type="text" class="form-control" @bind="formulario.contrasena" id="nombreActualizar" />
                 </div>
             }
         </EditForm>
