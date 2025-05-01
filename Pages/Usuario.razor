@@ -59,7 +59,12 @@ else
     @if (VisFormCrear)
     {
         <EditForm Model="@formulario" OnValidSubmit="CrearSeccion">
+    <div class="mb-3">
+        <label for="nombreCrear">Email:</label>
+        <input type="text" class="form-control" @bind="formulario.email" id="nombreCrear" />
+    </div>
 
+<<<<<<< HEAD
             <div class="mb-3">
                 <label for="nombreCrear">email:</label>
                 <input type="text" class="form-control" @bind="formulario.email" id="nombreCrear" />
@@ -71,6 +76,15 @@ else
             
             <button type="submit" class="btn btn-primary">Crear</button>
         </EditForm>
+=======
+    <div class="mb-3">
+        <label for="contrasenaCrear">Contraseña:</label>
+        <input type="password" class="form-control" @bind="formulario.contrasena" id="contrasenaCrear" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Crear</button>
+</EditForm>
+>>>>>>> fb0c8520498a4396e88ec78c89a7d4846a43609e
 
     }
 
@@ -290,8 +304,14 @@ else
         }
     }
 
-    private async Task CrearSeccion()
+   private async Task CrearSeccion()
+{
+    Cargando = true;
+    mensaje = null;
+
+    try
     {
+<<<<<<< HEAD
         Cargando = true;
         mensaje = null;
     
@@ -316,12 +336,34 @@ else
         catch (Exception ex)
         {
             mensaje = $"Error al crear usuario: {ex.Message}";
-        }
-        finally
+=======
+        var resultado = await servicioEntidad.CrearAsync(PROYECTO, TABLA, new Dictionary<string, object>()
         {
-            Cargando = false;
+            { "email", formulario.email },
+            { "contrasena", formulario.contrasena }
+        });
+
+        if (resultado)
+        {
+            mensaje = "Usuario creado con éxito";
+            formulario = new FormularioSeccion();
+>>>>>>> fb0c8520498a4396e88ec78c89a7d4846a43609e
+        }
+        else
+        {
+            mensaje = "Error al crear usuario";
         }
     }
+    catch (Exception ex)
+    {
+        mensaje = $"Error al crear usuario: {ex.Message}";
+    }
+    finally
+    {
+        Cargando = false;
+    }
+}
+
 
     private async Task ActualizarSeccion()
     {
