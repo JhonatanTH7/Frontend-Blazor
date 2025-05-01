@@ -288,12 +288,14 @@ else
 
         try
         {
-            var resultado = await servicioEntidad.CrearAsync(PROYECTO, TABLA, new Dictionary<string, object>(){{ "nombre",
-formulario.Nombre }});
+            var resultado = await servicioEntidad.CrearAsync(
+                PROYECTO, 
+                TABLA, 
+                new Dictionary<string, object>(){{ "descripcion", formulario.Nombre }});
 
             if (resultado)
             {
-                mensaje = "Sección creada con éxito";
+                mensaje = "Unidad creada con éxito";
                 formulario = new FormularioSeccion();
             }
             else
@@ -321,7 +323,7 @@ formulario.Nombre }});
         try
         {
             var resultado = await servicioEntidad.ActualizarAsync(PROYECTO, TABLA, "id", formulario.Codigo, new Dictionary<string,
-            object>(){{ "nombre",
+            object>(){{ "descripcion",
 formulario.Nombre }});
 
             if (resultado)
