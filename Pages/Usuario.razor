@@ -43,19 +43,13 @@ else
             {
                 <button type="button" class="btn btn-warning me-3" @onclick="ActualizarSeccion">Actualizar registro</button>
                 <div class="mb-3">
-                    <label for="newpassword">Ingrese el nuevo password:</label>
+                    <label for="newpassword">Nuevo password:</label>
                     <input type="text" class="form-control" @bind="formulario.contrasena" id="newpassword" />
                 </div>
             }
         </EditForm>
     }
 
-
-
- 
-
-
- 
     @if (VisFormCrear)
     {
         <EditForm Model="@formulario" OnValidSubmit="CrearSeccion">
@@ -64,19 +58,6 @@ else
         <input type="text" class="form-control" @bind="formulario.email" id="nombreCrear" />
     </div>
 
-<<<<<<< HEAD
-            <div class="mb-3">
-                <label for="nombreCrear">email:</label>
-                <input type="text" class="form-control" @bind="formulario.email" id="nombreCrear" />
-            </div>
-            <div class="mb-3">
-                <label for="contrasenaCrear">Contraseña:</label>
-                <input type="password" class="form-control" @bind="formulario.contrasena" id="contrasenaCrear" />
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Crear</button>
-        </EditForm>
-=======
     <div class="mb-3">
         <label for="contrasenaCrear">Contraseña:</label>
         <input type="password" class="form-control" @bind="formulario.contrasena" id="contrasenaCrear" />
@@ -84,7 +65,6 @@ else
 
     <button type="submit" class="btn btn-primary">Crear</button>
 </EditForm>
->>>>>>> fb0c8520498a4396e88ec78c89a7d4846a43609e
 
     }
 
@@ -311,32 +291,6 @@ else
 
     try
     {
-<<<<<<< HEAD
-        Cargando = true;
-        mensaje = null;
-    
-        try
-        {
-            var resultado = await servicioEntidad.CrearAsync(PROYECTO, TABLA, new Dictionary<string, object>()
-            {
-                { "email", formulario.email },
-                { "contrasena", formulario.contrasena }
-            });
-    
-            if (resultado)
-            {
-                mensaje = "Usuario creado con éxito";
-                formulario = new FormularioSeccion();
-            }
-            else
-            {
-                mensaje = "Error al crear usuario";
-            }
-        }
-        catch (Exception ex)
-        {
-            mensaje = $"Error al crear usuario: {ex.Message}";
-=======
         var resultado = await servicioEntidad.CrearAsync(PROYECTO, TABLA, new Dictionary<string, object>()
         {
             { "email", formulario.email },
@@ -347,7 +301,6 @@ else
         {
             mensaje = "Usuario creado con éxito";
             formulario = new FormularioSeccion();
->>>>>>> fb0c8520498a4396e88ec78c89a7d4846a43609e
         }
         else
         {
