@@ -2,6 +2,8 @@
 @using Services
 @layout EmptyLayout  
 @inject HttpClient Http
+@inject NavigationManager NavigationManager
+
 
 <!DOCTYPE html>
 <html>
@@ -53,6 +55,7 @@
             {
                 // Manejar éxito
                 Console.WriteLine("Usuario creado exitosamente.");
+                NavigationManager.NavigateTo("/Home", replace: true);
             }
             else
             {
@@ -82,11 +85,13 @@
             {
                 // Manejar éxito
                 Console.WriteLine("Inicio de sesión exitoso.");
+                NavigationManager.NavigateTo("/Home", replace: true);
             }
             else
             {
                 // Manejar error
                 Console.WriteLine("Error al iniciar sesión.");
+                
             }
         }
         catch (Exception ex)
