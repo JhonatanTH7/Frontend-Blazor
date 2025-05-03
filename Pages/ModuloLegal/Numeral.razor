@@ -1,0 +1,137 @@
+<!--  Define la ruta URL para acceder a esta página -->
+@page "/numeral"
+
+<!--  Importa el espacio de nombres para trabajar con JSON -->
+@using Services
+
+<!--  Importa el espacio de nombres donde se encuentra el ServicioEntidad-->
+@inject ServicioEntidad servicioEntidad
+
+<PageTitle>Numeral</PageTitle>
+
+<h1>Numeral</h1>
+
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="ManejarClickListar">Listar</button>
+</div>
+
+@if (Cargando)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+
+    @if (CargarTabla && numerales != null && numerales.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Literal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var numeral in numerales)
+                    {
+                        <tr>
+                            <td>@ObtenerValor(numeral, "id")</td>
+                            <td>@ObtenerValor(numeral, "descripcion")</td>
+                            <td>@ObtenerValor(numeral, "literal")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if ((numerales == null || numerales.Count == 0) && CargarTabla)
+    {
+        <p>No hay numerales disponibles.</p>
+    }
+
+}
+
+<!-- Mostrar mensaje de error si existe -->
+@if (mensaje != null)
+{
+    <div class="alert alert-secondary m-3">
+        @mensaje
+    </div>
+}
+
+
+
+@code {
+
+
+    // Lista para almacenar los productos que se obtienen de la API
+    private List<Dictionary<string, object>> numerales = new List<Dictionary<string, object>>();
+
+    // Variable para almacenar mensajes de error
+    private string? mensaje = null;
+    // Constantes para los parámetros de la API
+    private const string PROYECTO = "proyecto";
+    private const string TABLA = "numeral";
+    // Variables visibilidad
+    private bool Cargando = true;
+    private bool CargarTabla = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargarnumerales();
+    }
+
+    private async Task ManejarClickListar()
+    {
+        mensaje = null;
+        CargarTabla = true;
+        await Cargarnumerales();
+    }
+
+    private async Task Cargarnumerales()
+    {
+        Cargando = true;
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", "SELECT dbo.numeral.id, dbo.numeral.descripcion, dbo.literal.descripcion AS literal FROM dbo.literal INNER JOIN dbo.numeral ON dbo.literal.id = dbo.numeral.fkidliteral" } });
+            if (resultado != null)
+            {
+                numerales = resultado;
+            }
+            else
+            {
+                numerales = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar numerales: {ex.Message}";
+            numerales = new List<Dictionary<string, object>>();
+        }
+        finally
+        {
+            Cargando = false;
+            CargarTabla = true;
+        }
+    }
+
+    private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
+    {
+
+        if (diccionario == null)
+            return string.Empty;
+
+        if (diccionario.TryGetValue(clave, out var valor))
+        {
+            return valor?.ToString() ?? string.Empty;
+        }
+
+        return string.Empty;
+    }
+
+}

@@ -1,0 +1,137 @@
+<!--  Define la ruta URL para acceder a esta página -->
+@page "/paragrafo"
+
+<!--  Importa el espacio de nombres para trabajar con JSON -->
+@using Services
+
+<!--  Importa el espacio de nombres donde se encuentra el ServicioEntidad-->
+@inject ServicioEntidad servicioEntidad
+
+<PageTitle>Paragrafo</PageTitle>
+
+<h1>Paragrafo</h1>
+
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="ManejarClickListar">Listar</button>
+</div>
+
+@if (Cargando)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+
+    @if (CargarTabla && paragrafos != null && paragrafos.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Articulo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var paragrafo in paragrafos)
+                    {
+                        <tr>
+                            <td>@ObtenerValor(paragrafo, "id")</td>
+                            <td>@ObtenerValor(paragrafo, "descripcion")</td>
+                            <td>@ObtenerValor(paragrafo, "articulo")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if ((paragrafos == null || paragrafos.Count == 0) && CargarTabla)
+    {
+        <p>No hay paragrafos disponibles.</p>
+    }
+
+}
+
+<!-- Mostrar mensaje de error si existe -->
+@if (mensaje != null)
+{
+    <div class="alert alert-secondary m-3">
+        @mensaje
+    </div>
+}
+
+
+
+@code {
+
+
+    // Lista para almacenar los productos que se obtienen de la API
+    private List<Dictionary<string, object>> paragrafos = new List<Dictionary<string, object>>();
+
+    // Variable para almacenar mensajes de error
+    private string? mensaje = null;
+    // Constantes para los parámetros de la API
+    private const string PROYECTO = "proyecto";
+    private const string TABLA = "paragrafo";
+    // Variables visibilidad
+    private bool Cargando = true;
+    private bool CargarTabla = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargarparagrafos();
+    }
+
+    private async Task ManejarClickListar()
+    {
+        mensaje = null;
+        CargarTabla = true;
+        await Cargarparagrafos();
+    }
+
+    private async Task Cargarparagrafos()
+    {
+        Cargando = true;
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", "SELECT dbo.paragrafo.id, dbo.paragrafo.descripcion, dbo.articulo.nombre AS articulo FROM dbo.articulo INNER JOIN dbo.paragrafo ON dbo.articulo.id = dbo.paragrafo.fkidarticulo" } });
+            if (resultado != null)
+            {
+                paragrafos = resultado;
+            }
+            else
+            {
+                paragrafos = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar paragrafos: {ex.Message}";
+            paragrafos = new List<Dictionary<string, object>>();
+        }
+        finally
+        {
+            Cargando = false;
+            CargarTabla = true;
+        }
+    }
+
+    private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
+    {
+
+        if (diccionario == null)
+            return string.Empty;
+
+        if (diccionario.TryGetValue(clave, out var valor))
+        {
+            return valor?.ToString() ?? string.Empty;
+        }
+
+        return string.Empty;
+    }
+
+}
