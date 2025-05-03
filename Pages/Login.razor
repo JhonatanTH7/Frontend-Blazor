@@ -1,0 +1,102 @@
+@page "/login"
+@using Services
+@layout EmptyLayout  
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Slide Navbar</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="main">      
+        <input type="checkbox" id="chk" aria-hidden="true">
+
+        <div class="signup">
+            <form @onsubmit="CrearUsuario">
+                <label for="chk" aria-hidden="true">Crear Usuario</label>
+                <input type="email" @bind="NuevoUsuario.Email" placeholder="Email" required>
+                <input type="password" @bind="NuevoUsuario.Password" placeholder="Password" required>
+                <button type="submit">Crear</button>
+            </form>
+        </div>
+        <div class="login">
+            <form @onsubmit="IniciarSesion">
+                <label for="chk" aria-hidden="true">Loguearse</label>
+                <input type="email" @bind="UsuarioLogin.Email" placeholder="Email" required>
+                <input type="password" @bind="UsuarioLogin.Password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+
+@code {
+    private Usuario NuevoUsuario = new Usuario();
+    private Usuario UsuarioLogin = new Usuario();
+
+    private async Task CrearUsuario()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("http://localhost:5178/api/proyecto/usuario/verificar-contrasena", new
+            {
+                nombreTabla = "usuario",
+                valorUsuario = NuevoUsuario.Email,
+                valorContrasena = NuevoUsuario.Password
+            });
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Manejar éxito
+                Console.WriteLine("Usuario creado exitosamente.");
+            }
+            else
+            {
+                // Manejar error
+                Console.WriteLine("Error al crear el usuario.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private async Task IniciarSesion()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://localhost:7237/api/proyecto/usuario/verificar-contrasena", new
+            {
+                campoUsuario = "email",
+                campoContrasena = "contrasena",
+                valorUsuario = UsuarioLogin.Email,
+                valorContrasena = UsuarioLogin.Password
+            });
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Manejar éxito
+                Console.WriteLine("Inicio de sesión exitoso.");
+            }
+            else
+            {
+                // Manejar error
+                Console.WriteLine("Error al iniciar sesión.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private class Usuario
+    {
+        public string? Email { get; set; }
+        public string? Password { get; set; }
+    }
+}

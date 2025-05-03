@@ -52,13 +52,13 @@
 
       if (hasSeen)
       {
-        NavigationManager.NavigateTo("/Home", replace: true);
+        NavigationManager.NavigateTo("/login", replace: true);
       }
       else
       {
         await JS.InvokeVoidAsync("splashControl.setSplashShown");
-        await Task.Delay(10000); 
-        NavigationManager.NavigateTo("/Home", replace: true);
+        await Task.Delay(5000); 
+        NavigationManager.NavigateTo("/login", replace: true);
       }
     }
   }
