@@ -202,5 +202,76 @@ namespace FrontBlazor.Services  // Definir el espacio de nombres donde se ubicar
                 return false;  // Devolver false si ocurre un error
             }
         }
+
+
+
+
+        public async Task<List<Dictionary<string, object>>?> EjecutarConsultaAsync(
+            string nombreProyecto, 
+            string nombreTabla, 
+            Dictionary<string, object> parametros)
+        {
+
+            try
+            {
+                var url = $"{nombreProyecto}/{nombreTabla}/ejecutar-consulta-parametrizada";  // Construir la URL
+                
+                // Convertir el diccionario a JSON y prepararlo para enviarlo en la petición HTTP
+                var contenido = new StringContent(
+                    JsonSerializer.Serialize(parametros),  // Convertir el diccionario a una cadena JSON
+                    Encoding.UTF8,                      // Usar codificación UTF-8 (estándar para JSON)
+                    "application/json");                // Indicar que el contenido es de tipo JSON
+                
+                // Enviar la petición POST con los datos de la entidad
+                var respuesta = await _clienteHttp.PostAsync(url, contenido);
+                
+                return respuesta.IsSuccessStatusCode
+                    ? await respuesta.Content.ReadFromJsonAsync<List<Dictionary<string, object>>>(_opcionesJson) // Convertir la respuesta JSON a una lista de diccionarios
+                    : null;  // Devolver null si la respuesta no es exitosa
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al crear entidad: {ex.Message}");
+                return new List<Dictionary<string, object>>();
+            }
+        }
+
+
+        public async Task<List<Dictionary<string, object>>?> EjecutarProcedimientoAsync(
+    string nombreProyecto,
+    string nombreTabla,
+    string nombreSP,
+    Dictionary<string, object> parametros)
+{
+    try
+    {
+        var url = $"{nombreProyecto}/{nombreTabla}/ejecutar-sp";
+
+        // Agregar el nombre del SP como parámetro adicional
+        parametros["nombreSP"] = nombreSP;
+
+        var contenido = new StringContent(
+            JsonSerializer.Serialize(parametros),
+            Encoding.UTF8,
+            "application/json"
+        );
+
+        var respuesta = await _clienteHttp.PostAsync(url, contenido);
+        if (respuesta.IsSuccessStatusCode)
+        {
+            var resultado = await respuesta.Content.ReadFromJsonAsync<List<Dictionary<string, object>>>(_opcionesJson);
+            return resultado;
+        }
+
+        Console.WriteLine($"Error al ejecutar procedimiento: {respuesta.ReasonPhrase}");
+        return null;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Excepción en procedimiento: {ex.Message}");
+        return null;
+    }
+}
+        
     }
 }
