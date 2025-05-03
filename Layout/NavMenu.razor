@@ -22,7 +22,7 @@
 <!-- @NavMenuCssClass: clase dinámica que controla si el menú está colapsado o no -->
 <!-- nav-scrollable: permite desplazamiento si el menú es muy largo -->
 <!-- @onclick: colapsa el menú al hacer clic en cualquier opción (en dispositivos móviles) -->
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+<div class="@NavMenuCssClass nav-scrollable">
     <!-- Elemento de navegación con disposición en columna vertical -->
     <nav class="flex-column">
         <!-- Primera opción de menú: Home -->
@@ -39,74 +39,144 @@
             </NavLink>
         </div>
 
+
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="seccion">
-                Sección
-            </NavLink>
+            <div class="nav-link accordion text-center">
+                Modulo Legal
+                <span class="arrow">▼</span>
+            </div>
+            <div class="panel">
+                <div class=" nav-item px-3">
+                    <NavLink class="nav-link" href="seccion">
+                        Sección
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="subseccion">
+                        Subsección
+                    </NavLink>
+                </div>
+            </div>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="subseccion">
-                Subsección
-            </NavLink>
+            <div class="nav-link accordion text-center">Modulo de Indicadores <span class="arrow">▼</span></div>
+            <div class="panel">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="frecuencia">
+                        Frecuencia
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="tipoindicador">
+                        Tipo indicador
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="tipoactor">
+                        Tipo actor
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="sentido">
+                        Sentido
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="represenvisual">
+                        Represenvisual
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="fuente">
+                        Fuente
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="unidadmedicion">
+                        Unidad medición
+                    </NavLink>
+                </div>
+            </div>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="rol">
-                Rol
-            </NavLink>
+            <div class="nav-link accordion text-center">Modulo de Usuarios <span class="arrow">▼</span></div>
+            <div class="panel">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="rol">
+                        Rol
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="usuario">
+                        Usuario
+                    </NavLink>
+                </div>
+            </div>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="usuario">
-                Usuario
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="frecuencia">
-                Frecuencia
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="tipoindicador">
-                Tipo indicador
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="tipoactor">
-                Tipo actor
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="sentido">
-                Sentido
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="represenvisual">
-                Represenvisual
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fuente">
-                Fuente
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="unidadmedicion">
-                Unidad medición
-            </NavLink>
-        </div>
 
     </nav>
 </div>
+
+
+<style>
+    .accordion:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .panel {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease;
+    }
+
+    .arrow {
+        display: inline-block;
+        margin-left: 8px;
+        transition: transform 0.3s ease;
+    }
+
+    .accordion.active .arrow {
+        transform: rotate(180deg);
+    }
+</style>
+
+<script>
+    var acc = document.getElementsByClassName("accordion");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function () {
+
+            this.classList.toggle("active");
+
+            const panel = this.nextElementSibling;
+
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+                requestAnimationFrame(() => {
+                    panel.style.maxHeight = "0";
+                });
+                setTimeout(() => {
+                    panel.style.maxHeight = null;
+                }, 400);
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+        });
+    }
+</script>
 
 <!-- Bloque de código C# que define la lógica del componente -->
 @code {
