@@ -13,7 +13,7 @@
 	align-items: center;
 	min-height: 100vh;
 	font-family: 'Jost', sans-serif;
-	background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+	background: linear-gradient(to bottom, #0c0f2c, #3a1d77, #5e35b1);
     }
     .main{
         width: 350px;
@@ -72,7 +72,7 @@
         cursor: pointer;
     }
     button:hover{
-        background: #6d44b8;
+        background: #black;
     }
     .login{
         height: 460px;
@@ -97,72 +97,70 @@
     }
 
 </style>
+<div class="main">      
+    <input type="checkbox" id="chk" aria-hidden="true">
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Slide Navbar</title>
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="main">      
-        <input type="checkbox" id="chk" aria-hidden="true">
-
-        <div class="signup">
-            <form @onsubmit="CrearUsuario">
-                <label for="chk" aria-hidden="true">Crear Usuario</label>
-                <input type="email" @bind="NuevoUsuario.Email" placeholder="Email" required>
-                <input type="password" @bind="NuevoUsuario.Password" placeholder="Password" required>
-                <button type="submit">Crear</button>
-            </form>
-        </div>
-        <div class="login">
-            <form @onsubmit="IniciarSesion">
-                <label for="chk" aria-hidden="true">Loguearse</label>
-                <input type="email" @bind="UsuarioLogin.Email" placeholder="Email" required>
-                <input type="password" @bind="UsuarioLogin.Password" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
-        </div>
+    <div class="signup">
+        <form @onsubmit="CrearUsuario">
+            <label for="chk" aria-hidden="true">Crear Usuario</label>
+            <input type="email" @bind="NuevoUsuario.Email" placeholder="Email" required>                
+            <input type="password" @bind="NuevoUsuario.Password" placeholder="Password" required>
+            <input type="password" @bind="NuevoUsuario.ConfPass" placeholder="confirm password" required>
+            <button type="submit">Crear</button>
+            @if (!string.IsNullOrEmpty(ErrorMensaje))
+            {
+                <div style="color: red; text-align: center; font-weight: bold; margin-top: 10px;">
+                    @ErrorMensaje
+                </div>
+            }
+        </form>
     </div>
-</body>
-</html>
+    <div class="login">
+        <form @onsubmit="IniciarSesion">
+            <label for="chk" aria-hidden="true">Loguearse</label>
+            <input type="email" @bind="UsuarioLogin.Email" placeholder="Email" required>
+            <input type="password" @bind="UsuarioLogin.Password" placeholder="Password" required>
+            <button type="submit">Login</button>
+            
+        </form>            
+    </div>
+</div>
 
-
-<style>
-    
-</style>
 
 @code {
     private Usuario NuevoUsuario = new Usuario();
     private Usuario UsuarioLogin = new Usuario();
 
+    private string? ErrorMensaje { get; set; }
     private async Task CrearUsuario()
     {
         try
         {
-            var response = await Http.PostAsJsonAsync("http://localhost:5178/api/proyecto/usuario", new
+            if (NuevoUsuario.Password != NuevoUsuario.ConfPass)
             {
-                email = NuevoUsuario.Email,
-                contrasena = NuevoUsuario.Password
-            });
-
-            if (response.IsSuccessStatusCode)
-            {
-                // Manejar éxito
-                Console.WriteLine("Usuario creado exitosamente.");
-                NavigationManager.NavigateTo("/Home", replace: true);
+                ErrorMensaje = "Las contraseñas no coinciden.";
+                return;              
             }
             else
             {
-                // Manejar error
-                Console.WriteLine("Error al crear el usuario.");
+                var response = await Http.PostAsJsonAsync("http://localhost:5178/api/proyecto/usuario", new
+                {
+                    email = NuevoUsuario.Email,
+                    contrasena = NuevoUsuario.Password
+                });
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Manejar éxito
+                    Console.WriteLine("Usuario creado exitosamente.");
+                    NavigationManager.NavigateTo("/Home", replace: true);
+                }
             }
+            
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            ErrorMensaje = $"Error: {ex.Message}";
         }
     }
 
@@ -202,5 +200,8 @@
     {
         public string? Email { get; set; }
         public string? Password { get; set; }
+        public string? ConfPass { get; set; }
+
+        
     }
 }
