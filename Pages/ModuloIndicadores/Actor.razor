@@ -1,0 +1,449 @@
+<!--  Define la ruta URL para acceder a esta página -->
+@page "/actor"
+
+<!--  Importa el espacio de nombres para trabajar con JSON -->
+@using Services
+
+<!--  Importa el espacio de nombres donde se encuentra el ServicioEntidad-->
+@inject ServicioEntidad servicioEntidad
+@inject IJSRuntime JS
+
+<PageTitle>Actor</PageTitle>
+
+<h1>Actor</h1>
+
+
+<div class="mb-3 d-flex gap-2 justify-content-between align-items-center">
+
+    <div class="head-left-side d-flex gap-2">
+    <button class="btn btn-primary" @onclick="ManejarClickListar">Listar</button>
+    <button class="btn btn-primary" @onclick="() => CargarActoresPorNombre(nombreConsulta)">Consultar</button>
+    <input type="text" class="form-control" id="iptConsultar" placeholder="Consultar Actor / Nombre" @bind="nombreConsulta" />
+    </div>
+
+    <div class="head-right-side">
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#crearModel">Crear</button>
+
+        <div class="modal fade" id="crearModel" tabindex="-1" aria-labelledby="crearModelLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="crearModelLabel">Crear Actor</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@formularioActor" OnValidSubmit="CrearActor">
+
+                        <div class="mb-3">
+                            <label for="iptId">Ingrese el Id: </label>
+                            <input type="number" placeholder="10024785" class="form-control" id="iptId" @bind="@formularioActor.id"/>
+                        </div>
+                        
+                        <div class="mb-3">
+                        <label for="iptNombre">Ingrese el Nombre: </label>
+                        <input type="text" placeholder="John Doe" class="form-control" id="iptNombre" @bind="@formularioActor.nombre"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sltTipoActor">Seleccione el Tipo de Actor: </label>
+                            <select name="sltTipoActor" id="sltTipoActor" class="form-select" @bind="@formularioActor.fkIdTipoActor">
+                                @if (tiposActor != null && tiposActor.Count > 0)
+                                {
+                                    <option value="" disabled selected>Seleccione un tipo de actor</option>
+                                    foreach (var tipo in tiposActor)
+                                    {
+                                        var idTipo = ObtenerValor(tipo, "id");
+                                        var nombreTipo = ObtenerValor(tipo, "nombre");
+                                        <option value="@idTipo">@nombreTipo</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled selected>No hay tipos de actores disponibles</option>
+                                }
+                            </select>
+                        </div>
+
+                    </EditForm>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="(() => formularioActor = new FormularioActor())" id="btnModalCrear">Cerrar</button>
+                    <button type="button" class="btn btn-success" disabled="@(tiposActor == null || tiposActor.Count == 0)" @onclick="CrearActor" >Guardar</button>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@if (Cargando)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+
+    @if (CargarTabla && actores != null && actores.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Nombre</th>
+                        <th>Tipo Actor</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var actor in actores)
+                    {
+                            var idActor = ObtenerValor(actor, "idActor");
+                            var nombreActor = ObtenerValor(actor, "nombreActor");
+                            var nombreTipoActor = ObtenerValor(actor, "nombreTipoActor");
+                            var fkIdTipoActor = ObtenerValor(actor, "fkIdTipoActor");
+                        <tr>
+                            <td>@ObtenerValor(actor, "idActor")</td>
+                            <td>@ObtenerValor(actor, "nombreActor")</td>
+                            <td>@ObtenerValor(actor, "nombreTipoActor")</td>
+                            <td>
+                                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="@($"#{nombreActor.Replace(" ", "")}{idActor}Modal")"
+                                    @onclick="@(async () => {
+                                        formularioActor.id = idActor;
+                                        formularioActor.nombre = nombreActor;
+                                        formularioActor.fkIdTipoActor = fkIdTipoActor;
+                                        await Task.CompletedTask;
+                                    })">
+                                    Editar
+                                </button>
+
+                                <div class="modal fade" id="@($"{nombreActor.Replace(" ", "")}{idActor}Modal")" tabindex="-1"
+                                    aria-labelledby="@($"{nombreActor.Replace(" ", "")}{idActor}ModalLabel")" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="@($"{nombreActor.Replace(" ", "")}{idActor}ModalLabel")">
+                                                     Actualizando Actor: @nombreActor
+                                                </h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+
+                                                <EditForm Model="@formularioActor" OnValidSubmit="ActualizarActor">
+                                                
+                                                    <div class="mb-3">
+                                                        <label for="iptNombre">Ingrese el Nombre: </label>
+                                                        <input type="text" placeholder="John Doe" class="form-control" id="iptNombre" @bind="@formularioActor.nombre"/>
+                                                    </div>
+                                                        <div class="mb-3">
+                                                            <label for="sltTipoActor">Seleccione el Tipo de Actor: </label>
+                                                            <select name="sltTipoActor" id="sltTipoActor" class="form-select" @bind="@formularioActor.fkIdTipoActor">
+                                                                @if (tiposActor != null && tiposActor.Count > 0)
+                                                                {
+                                                                    <option value="" disabled selected>Seleccione un tipo de actor</option>
+                                                                    foreach (var tipo in tiposActor)
+                                                                    {
+                                                                        var idTipo = ObtenerValor(tipo, "id");
+                                                                        var nombreTipo = ObtenerValor(tipo, "nombre");
+                                                                        <option value="@idTipo">@nombreTipo</option>
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option value="" disabled selected>No hay tipos de actores disponibles</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                </EditForm>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="(() => formularioActor = new FormularioActor())">Cerrar</button>
+                                                <button type="button" class="btn btn-success" disabled="@(tiposActor == null || tiposActor.Count == 0)" @onclick="ActualizarActor" >Guardar</button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-danger" @onclick="@( () =>  ManejarClickEliminar(idActor))">Eliminar</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if ((actores == null || actores.Count == 0) && CargarTabla)
+    {
+        <p>No hay actores disponibles.</p>
+    }
+
+}
+
+<!-- Mostrar mensaje de error si existe -->
+@if (mensaje != null)
+{
+    <div class="alert alert-secondary m-3">
+        @mensaje
+    </div>
+}
+
+
+
+@code {
+
+    // Variables para almacenar las listas
+    private List<Dictionary<string, object>> actores = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> tiposActor = new List<Dictionary<string, object>>();
+
+    // Variable para almacenar el formulario
+    private FormularioActor formularioActor = new FormularioActor();
+
+    // Variable para almacenar mensajes de error
+    private string? mensaje = null;
+
+    // Constantes para los parámetros de la API
+    private const string PROYECTO = "proyecto";
+    private const string TABLA = "actor";
+
+    // Variable para almacenar el nombre a consultar
+    private string nombreConsulta = string.Empty;
+
+    // Variables visibilidad
+    private bool Cargando = true;
+    private bool CargarTabla = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarTiposActor();
+        await CargarActores();
+    }
+
+    private class FormularioActor
+    {
+        public string id { get; set; } = "";
+        public string nombre { get; set; } = "";
+        public string fkIdTipoActor { get; set; } = "";
+    }
+
+    private async void ManejarClickListar()
+    {
+        mensaje = null;
+        await CargarActores();
+        StateHasChanged();
+    }
+
+    private async void ManejarClickEliminar(string id)
+    {
+        mensaje = null;
+        var confirmar = await JS.InvokeAsync<bool>("confirm", "¿Está seguro de que desea eliminar este actor?");
+        if (!confirmar)
+        {
+            return;
+        }
+        await EliminarActor(id);
+    }
+
+    private async Task CargarActores()
+    {
+        Cargando = true;
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", "SELECT dbo.actor.id AS idActor, dbo.actor.nombre AS nombreActor, dbo.actor.fkidtipoactor AS fkIdTipoActor, dbo.tipoactor.nombre AS nombreTipoActor FROM dbo.actor INNER JOIN dbo.tipoactor ON dbo.actor.fkidtipoactor = dbo.tipoactor.id" } });
+            if (resultado != null)
+            {
+                actores = resultado;
+            }   
+            else
+            {
+                actores = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar actores: {ex.Message}";
+            actores = new List<Dictionary<string, object>>();
+        }
+        finally
+        {
+            Cargando = false;
+            CargarTabla = true;
+        }
+    }
+
+    private async Task CargarTiposActor()
+    {
+        Cargando = true;
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "tipoactor");
+            if (resultado != null)
+            {
+                tiposActor = resultado;
+            }
+            else
+            {
+                tiposActor = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar tipos de actor: {ex.Message}";
+            tiposActor = new List<Dictionary<string, object>>();
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+
+    private async Task CrearActor()
+    {
+        Cargando = true;
+
+        mensaje = null;
+
+        try
+        {
+            Console.WriteLine($"Id: {formularioActor.id}");
+            Console.WriteLine($"Nombre: {formularioActor.nombre}");
+            Console.WriteLine($"Tipo Actor: {formularioActor.fkIdTipoActor}");
+
+            var resultado = await servicioEntidad.CrearAsync(PROYECTO, TABLA, new Dictionary<string, object>(){{ "id", formularioActor.id }, { "nombre", formularioActor.nombre }, { "fkIdTipoActor", formularioActor.fkIdTipoActor }});
+
+            if (resultado)
+            {
+                mensaje = "Actor creado con éxito";
+                await CargarActores();
+                StateHasChanged();
+                formularioActor = new FormularioActor();
+            }
+            else
+            {
+                mensaje = "Error al crear Actor";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al crear Actor: {ex.Message}";
+        }
+        finally
+        {
+            Cargando = false;
+        }
+
+    }
+
+    private async Task EliminarActor(string id)
+    {
+
+        mensaje = null;
+
+        try
+        {
+
+            var resultado = await servicioEntidad.EliminarAsync(PROYECTO, TABLA, "id", id);
+
+            if (resultado)
+            {
+                mensaje = "Actor eliminada con éxito";
+                await CargarActores();
+                StateHasChanged();
+                formularioActor = new FormularioActor();
+            }
+            else
+            {
+                mensaje = "Error al eliminar Actor";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al eliminar Actor: {ex.Message}";
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+
+    private async Task ActualizarActor()
+    {
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.ActualizarAsync(PROYECTO, TABLA, "id", formularioActor.id, new Dictionary<string, object>() { { "nombre", formularioActor.nombre }, { "fkIdTipoActor", formularioActor.fkIdTipoActor } });
+
+            if (resultado)
+            {
+                mensaje = "Actor actualizado con éxito";
+                await CargarActores();
+                StateHasChanged();
+                formularioActor = new FormularioActor();
+            }
+            else
+            {
+                mensaje = "Error al actualizar Actor";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al actualizar Actor: {ex.Message}";
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+
+    private async Task CargarActoresPorNombre(string nombre)
+    {
+        Cargando = true;
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", $"SELECT dbo.actor.id AS idActor, dbo.actor.nombre AS nombreActor, dbo.actor.fkidtipoactor AS fkIdTipoActor, dbo.tipoactor.nombre AS nombreTipoActor FROM dbo.actor INNER JOIN dbo.tipoactor ON dbo.actor.fkidtipoactor = dbo.tipoactor.id WHERE dbo.actor.nombre LIKE '%{nombre}%'" } });
+            if (resultado != null)
+            {
+                actores = resultado;
+                nombreConsulta = string.Empty;
+            }
+            else
+            {
+                actores = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar actores: {ex.Message}";
+            actores = new List<Dictionary<string, object>>();
+        }
+        finally
+        {
+            Cargando = false;
+            CargarTabla = true;
+        }
+    }
+
+    private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
+    {
+
+        if (diccionario == null)
+            return string.Empty;
+
+        if (diccionario.TryGetValue(clave, out var valor))
+        {
+            return valor?.ToString() ?? string.Empty;
+        }
+
+        return string.Empty;
+    }
+
+}
