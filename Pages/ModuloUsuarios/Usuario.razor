@@ -7,9 +7,9 @@
 <!--  Importa el espacio de nombres donde se encuentra el ServicioEntidad-->
 @inject ServicioEntidad servicioEntidad
 
-<PageTitle>Usuario</PageTitle>
+<PageTitle>Usuarios</PageTitle>
 
-<h1>Usuario</h1>
+<h1>Usuarios</h1>
 
 <div class="mb-3">
     <button class="btn btn-primary" @onclick="ManejarClickListar">Listar</button>
@@ -18,7 +18,6 @@
     <button class="btn btn-warning" @onclick="ManejarClickActualizar">Actualizar</button>
     <button class="btn btn-danger" @onclick="ManejarClickEliminar">Eliminar</button>
 </div>
-
 
 @if (Cargando)
 {
@@ -29,23 +28,36 @@ else
 
     @if (VisFormConsultar)
     {
-        <EditForm Model="@formulario" OnValidSubmit="CargarSeccionPorClave">
+        <EditForm Model="@formulario" OnValidSubmit="CargarUsuarioPorClave">
             <div class="mb-3">
                 <label for="idConsultar">email:</label>
-                <input type="text" class="form-control" @bind="formulario.email" id="idConsultar" />
+                <input type="text" class="form-control" @bind="formulario.email" id="idConsultar" required />
             </div>
             <button type="submit" class="btn btn-primary me-3">Consultar</button>
             @if (VisFormEliminar)
             {
-                <button type="button" class="btn btn-danger" @onclick="EliminarSeccion">Eliminar registro</button>
+                <button type="button" class="btn btn-danger" @onclick="EliminarUsuario">Eliminar registro</button>
             }
             else if (VisFormActualizar)
             {
-                <button type="button" class="btn btn-warning me-3" @onclick="ActualizarSeccion">Actualizar registro</button>
+                <button type="button" class="btn btn-warning me-3" @onclick="ActualizarUsuario">Actualizar registro</button>
                 <div class="mb-3">
                     <label for="newpassword">Nuevo password:</label>
-                    <input type="text" class="form-control" @bind="formulario.contrasena" id="newpassword" />
-
+                    <input type="password" class="form-control" @bind="formulario.contrasena" id="newpassword" />
+                </div>
+                <span>Roles:</span>
+                <div class="d-flex gap-3">
+                    @foreach (var rol in listaRoles)
+                    {
+                        var nombreRol = ObtenerValor(rol, "nombre");
+                        var idRol = ObtenerValor(rol, "id");
+                        <div class="mb-3">
+                            <label for="@($"{nombreRol}RolCheck")" class="form-check-label">@($"{nombreRol}:")</label>
+                            <input type="checkbox" class="form-check-input" id="@($"{nombreRol}RolCheck")" value="@idRol"
+                                checked="@(rolesSeleccionados.ContainsKey(idRol) && rolesSeleccionados[idRol])"
+                                @onchange="(e) => ActualizarSeleccionRol(idRol, e.Value!)" />
+                        </div>
+                    }
                 </div>
             }
         </EditForm>
@@ -53,47 +65,100 @@ else
 
     @if (VisFormCrear)
     {
-        <EditForm Model="@formulario" OnValidSubmit="CrearSeccion">
-    <div class="mb-3">
-        <label for="nombreCrear">Email:</label>
-        <input type="text" class="form-control" @bind="formulario.email" id="nombreCrear" />
-    </div>
+        <EditForm Model="@formulario" OnValidSubmit="CrearUsuario">
+            <div class="mb-3">
+                <label for="nombreCrear">Email:</label>
+                <input type="text" class="form-control" @bind="formulario.email" id="nombreCrear" required />
+            </div>
 
-    <div class="mb-3">
-        <label for="contrasenaCrear">Contraseña:</label>
-        <input type="password" class="form-control" @bind="formulario.contrasena" id="contrasenaCrear" />
-    </div>
+            <div class="mb-3">
+                <label for="contrasenaCrear">Contraseña:</label>
+                <input type="password" class="form-control" @bind="formulario.contrasena" id="contrasenaCrear" required />
+            </div>
 
-    <button type="submit" class="btn btn-primary">Crear</button>
-</EditForm>
+            <button type="submit" class="btn btn-primary">Crear</button>
+        </EditForm>
 
     }
 
-    @if (CargarTabla && secciones != null && secciones.Count > 0)
+    @if (CargarTabla && usuarios != null && usuarios.Count > 0)
     {
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>email</th>
-                        <th>contrasena</th>
+                        <th>Email</th>
+                        <th>Contraseña</th>
+                        <th>Roles</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var seccion in secciones)
+                    @foreach (var Usuario in usuarios)
                     {
+                        var email = ObtenerValor(Usuario, "email");
                         <tr>
-                            <td>@ObtenerValor(seccion, "email")</td>
-                            <td>@ObtenerValor(seccion, "contrasena")</td>
+                            <td>@ObtenerValor(Usuario, "email")</td>
+                            <td>@ObtenerValor(Usuario, "contrasena")</td>
+                            <td>
+
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="@($"#{email}Modal")" @onclick="() => CargarRolesUsuario(email)">
+                                    Ver
+                                </button>
+
+                                <div class="modal fade" id="@($"{email}Modal")" tabindex="-1"
+                                    aria-labelledby="@($"{email}ModalLabel")">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="@($"{email}ModalLabel")">Roles de @email</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+
+                                                @if (usuarioRoles != null && usuarioRoles.ContainsKey(email))
+                                                {
+                                                    var roles = usuarioRoles[email] as List<Dictionary<string, object>>;
+                                                    if (roles != null && roles.Count > 0)
+                                                    {
+                                                        <ul>
+                                                            @foreach (var rol in roles)
+                                                            {
+                                                                <li>@ObtenerValor(rol, "nombreRol")</li>
+                                                            }
+                                                        </ul>
+                                                    }
+                                                    else
+                                                    {
+                                                        <p>No se encontraron roles para este usuario.</p>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-link" @onclick="() => CargarRolesUsuario(email)">Cargar
+                                                        roles</button>
+                                                }
+
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cerrar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
     }
-    else if ((secciones == null || secciones.Count == 0) && CargarTabla)
+    else if ((usuarios == null || usuarios.Count == 0) && CargarTabla)
     {
-        <p>No hay secciones disponibles.</p>
+        <p>No hay usuarios disponibles.</p>
     }
 
 }
@@ -110,10 +175,14 @@ else
 @code {
 
     // Lista para almacenar los productos que se obtienen de la API
-    private List<Dictionary<string, object>> secciones = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> usuarios = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> listaRoles = new List<Dictionary<string, object>>();
+    private Dictionary<string, object> usuarioRoles = new Dictionary<string, object>();
+    private Dictionary<string, bool> rolesSeleccionados = new Dictionary<string, bool>();
 
-    // Variable para almacenar el formulario de sección
-    private FormularioSeccion formulario = new FormularioSeccion();
+
+    // Variable para almacenar el formulario de Usuario
+    private FormularioUsuario formulario = new FormularioUsuario();
 
     // Variable para almacenar mensajes de error
     private string? mensaje = null;
@@ -137,10 +206,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await CargarSecciones();
+        await Cargarusuarios();
+        await ObtenerRoles();
     }
 
-    private class FormularioSeccion
+    private class FormularioUsuario
     {
         public string email { get; set; } = "";
         public string contrasena { get; set; } = "";
@@ -149,17 +219,17 @@ else
     private async Task ManejarClickListar()
     {
         mensaje = null;
-        formulario = new FormularioSeccion();
+        formulario = new FormularioUsuario();
         CargarTabla = true;
         VisFormConsultar = false;
         VisFormCrear = false;
-        await CargarSecciones();
+        await Cargarusuarios();
     }
 
     private void ManejarClickConsultar()
     {
         mensaje = null;
-        formulario = new FormularioSeccion();
+        formulario = new FormularioUsuario();
         VisFormConsultar = true;
         VisFormCrear = false;
         VisFormActualizar = false;
@@ -172,7 +242,7 @@ else
     private void ManejarClickCrear()
     {
         mensaje = null;
-        formulario = new FormularioSeccion();
+        formulario = new FormularioUsuario();
         VisFormCrear = true;
         VisFormConsultar = false;
         VisFormActualizar = false;
@@ -185,7 +255,7 @@ else
     private void ManejarClickActualizar()
     {
         mensaje = null;
-        formulario = new FormularioSeccion();
+        formulario = new FormularioUsuario();
         EstadoActualizando = true;
         VisFormConsultar = true;
         VisFormActualizar = false;
@@ -198,7 +268,7 @@ else
     private void ManejarClickEliminar()
     {
         mensaje = null;
-        formulario = new FormularioSeccion();
+        formulario = new FormularioUsuario();
         EstadoEliminando = true;
         VisFormConsultar = true;
         VisFormEliminar = false;
@@ -208,7 +278,7 @@ else
         EstadoActualizando = false;
     }
 
-    private async Task CargarSecciones()
+    private async Task Cargarusuarios()
     {
         Cargando = true;
         mensaje = null;
@@ -218,17 +288,17 @@ else
             var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, TABLA);
             if (resultado != null)
             {
-                secciones = resultado;
+                usuarios = resultado;
             }
             else
             {
-                secciones = new List<Dictionary<string, object>>();
+                usuarios = new List<Dictionary<string, object>>();
             }
         }
         catch (Exception ex)
         {
-            mensaje = $"Error al cargar secciones: {ex.Message}";
-            secciones = new List<Dictionary<string, object>>();
+            mensaje = $"Error al cargar usuarios: {ex.Message}";
+            usuarios = new List<Dictionary<string, object>>();
         }
         finally
         {
@@ -237,7 +307,7 @@ else
         }
     }
 
-    private async Task CargarSeccionPorClave()
+    private async Task CargarUsuarioPorClave()
     {
         Cargando = true;
 
@@ -254,8 +324,8 @@ else
 
             if (resultado != null)
             {
-                secciones = new List<Dictionary<string, object>>() { resultado };
-                if (secciones != null && secciones.Count > 0)
+                usuarios = new List<Dictionary<string, object>>() { resultado };
+                if (usuarios != null && usuarios.Count > 0)
                 {
                     if (EstadoEliminando)
                     {
@@ -263,20 +333,23 @@ else
                     }
                     else if (EstadoActualizando)
                     {
+                        await ObtenerRoles();
+                        await CargarRolesUsuario(formulario.email);
+                        CargarRolesSeleccionados();
                         VisFormActualizar = true;
                     }
                 }
             }
             else
             {
-                secciones = new List<Dictionary<string, object>>();
+                usuarios = new List<Dictionary<string, object>>();
             }
         }
         catch (Exception ex)
         {
 
-            mensaje = $"Error al cargar seccion: {ex.Message}";
-            secciones = new List<Dictionary<string, object>>();
+            mensaje = $"Error al cargar Usuario: {ex.Message}";
+            usuarios = new List<Dictionary<string, object>>();
         }
         finally
         {
@@ -285,41 +358,41 @@ else
         }
     }
 
-   private async Task CrearSeccion()
+    private async Task CrearUsuario()
+    {
+        Cargando = true;
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.CrearAsync(PROYECTO, TABLA, new Dictionary<string, object>()
 {
-    Cargando = true;
-    mensaje = null;
+{ "email", formulario.email },
+{ "contrasena", formulario.contrasena }
+});
 
-    try
-    {
-        var resultado = await servicioEntidad.CrearAsync(PROYECTO, TABLA, new Dictionary<string, object>()
-        {
-            { "email", formulario.email },
-            { "contrasena", formulario.contrasena }
-        });
-
-        if (resultado)
-        {
-            mensaje = "Usuario creado con éxito";
-            formulario = new FormularioSeccion();
+            if (resultado)
+            {
+                mensaje = "Usuario creado con éxito";
+                formulario = new FormularioUsuario();
+            }
+            else
+            {
+                mensaje = "Error al crear usuario";
+            }
         }
-        else
+        catch (Exception ex)
         {
-            mensaje = "Error al crear usuario";
+            mensaje = $"Error al crear usuario: {ex.Message}";
+        }
+        finally
+        {
+            Cargando = false;
         }
     }
-    catch (Exception ex)
-    {
-        mensaje = $"Error al crear usuario: {ex.Message}";
-    }
-    finally
-    {
-        Cargando = false;
-    }
-}
 
 
-    private async Task ActualizarSeccion()
+    private async Task ActualizarUsuario()
     {
         Cargando = true;
 
@@ -333,17 +406,32 @@ formulario.contrasena }});
 
             if (resultado)
             {
-                mensaje = "Sección actualizada con éxito";
-                formulario = new FormularioSeccion();
+                foreach (var rol in rolesSeleccionados)
+                {
+
+                    var idRol = rol.Key;
+                    if (rol.Value)
+                    {
+                        await CrearRolUsuario(formulario.email, idRol);
+                    }
+                    else
+                    {
+                        await BorrarRolUsuario(formulario.email, idRol);
+                    }
+                }
+
+                mensaje = "Usuario actualizado con éxito";
+                formulario = new FormularioUsuario();
             }
             else
             {
-                mensaje = "Error al actualizar sección";
+                mensaje = "Error al actualizar Usuario";
             }
+
         }
         catch (Exception ex)
         {
-            mensaje = $"Error al actualizar sección: {ex.Message}";
+            mensaje = $"Error al actualizar Usuario: {ex.Message}";
         }
         finally
         {
@@ -351,7 +439,7 @@ formulario.contrasena }});
         }
     }
 
-    private async Task EliminarSeccion()
+    private async Task EliminarUsuario()
     {
         Cargando = true;
 
@@ -364,23 +452,143 @@ formulario.contrasena }});
 
             if (resultado)
             {
-                mensaje = "Sección eliminada con éxito";
-                formulario = new FormularioSeccion();
+                mensaje = "Usuario eliminado con éxito";
+                formulario = new FormularioUsuario();
             }
             else
             {
-                mensaje = "Error al eliminar sección";
+                mensaje = "Error al eliminar Usuario";
             }
         }
         catch (Exception ex)
         {
-            mensaje = $"Error al eliminar sección: {ex.Message}";
+            mensaje = $"Error al eliminar Usuario: {ex.Message}";
         }
         finally
         {
             Cargando = false;
         }
     }
+
+    private async Task CargarRolesUsuario(string email)
+    {
+        usuarioRoles = new Dictionary<string, object>();
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarProcedimientoAsync(PROYECTO, TABLA, "RolPorUsuario", new
+            Dictionary<string, object> { { "Email", email } });
+
+            if (resultado != null)
+            {
+                usuarioRoles[email] = resultado;
+            }
+            else
+            {
+                usuarioRoles = new Dictionary<string, object>();
+            }
+        }
+        catch
+        {
+            usuarioRoles = new Dictionary<string, object>();
+            mensaje = $"Error al cargar roles para el usuario {email}";
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task ObtenerRoles()
+    {
+        listaRoles = new List<Dictionary<string, object>>();
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "rol");
+
+            if (resultado != null)
+            {
+                listaRoles = resultado;
+            }
+            else
+            {
+                listaRoles = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar roles: {ex.Message}";
+            listaRoles = new List<Dictionary<string, object>>();
+        }
+    }
+
+    private void CargarRolesSeleccionados()
+    {
+        if (usuarioRoles != null && usuarioRoles.ContainsKey(formulario.email) && listaRoles != null)
+        {
+            var rolesDelUsuario = usuarioRoles[formulario.email] as List<Dictionary<string, object>>;
+            foreach (var rol in listaRoles)
+            {
+                var idRol = ObtenerValor(rol, "id");
+                if (rolesDelUsuario != null && rolesDelUsuario.Any(r => ObtenerValor(r, "idRol") == idRol))
+                {
+                    rolesSeleccionados[idRol] = true;
+                }
+                else
+                {
+                    rolesSeleccionados[idRol] = false;
+                }
+            }
+        }
+        else
+        {
+            rolesSeleccionados = new Dictionary<string, bool>();
+        }
+
+    }
+
+    private void ActualizarSeleccionRol(string idRol, object checkedValue)
+    {
+        bool isChecked = checkedValue is bool b && b;
+        rolesSeleccionados[idRol] = isChecked;
+    }
+
+    private async Task CrearRolUsuario(string email, string idRol)
+    {
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarProcedimientoAsync(PROYECTO, TABLA, "CrearRolUsuario", new
+            Dictionary<string, object>()
+{
+{ "Email", email },
+{ "IdRol", idRol }
+});
+
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al crear rol para el usuario {email}: {ex.Message}";
+        }
+
+    }
+
+    private async Task BorrarRolUsuario(string email, string idRol)
+    {
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarProcedimientoAsync(PROYECTO, TABLA, "BorrarRolUsuario", new
+            Dictionary<string, object>()
+{
+{ "Email", email },
+{ "IdRol", idRol }
+});
+
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al borrar rol para el usuario {email}: {ex.Message}";
+        }
+
+    }
+
 
     private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
     {
