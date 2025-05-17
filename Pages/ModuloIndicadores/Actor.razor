@@ -67,7 +67,7 @@
                     </EditForm>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="(() => formularioActor = new FormularioActor())" id="btnModalCrear">Cerrar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="(() => formularioActor = new FormularioActor())">Cerrar</button>
                     <button type="button" class="btn btn-success" disabled="@(tiposActor == null || tiposActor.Count == 0)" @onclick="CrearActor" >Guardar</button>
                 </div>
                 </div>
@@ -238,7 +238,7 @@ else
     private async void ManejarClickEliminar(string id)
     {
         mensaje = null;
-        var confirmar = await JS.InvokeAsync<bool>("confirm", "¿Está seguro de que desea eliminar este actor?");
+        var confirmar = await JS.InvokeAsync<bool>("confirm", "¿Está seguro de que desea eliminar este Actor?");
         if (!confirmar)
         {
             return;
@@ -311,9 +311,6 @@ else
 
         try
         {
-            Console.WriteLine($"Id: {formularioActor.id}");
-            Console.WriteLine($"Nombre: {formularioActor.nombre}");
-            Console.WriteLine($"Tipo Actor: {formularioActor.fkIdTipoActor}");
 
             var resultado = await servicioEntidad.CrearAsync(PROYECTO, TABLA, new Dictionary<string, object>(){{ "id", formularioActor.id }, { "nombre", formularioActor.nombre }, { "fkIdTipoActor", formularioActor.fkIdTipoActor }});
 
@@ -352,7 +349,7 @@ else
 
             if (resultado)
             {
-                mensaje = "Actor eliminada con éxito";
+                mensaje = "Actor eliminado con éxito";
                 await CargarActores();
                 StateHasChanged();
                 formularioActor = new FormularioActor();

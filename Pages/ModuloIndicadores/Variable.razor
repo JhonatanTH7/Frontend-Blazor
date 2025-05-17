@@ -1,0 +1,443 @@
+<!--  Define la ruta URL para acceder a esta página -->
+@page "/variable"
+
+<!--  Importa el espacio de nombres para trabajar con JSON -->
+@using Services
+
+<!--  Importa el espacio de nombres donde se encuentra el ServicioEntidad-->
+@inject ServicioEntidad servicioEntidad
+@inject IJSRuntime JS
+
+<PageTitle>Variable</PageTitle>
+
+<h1>Variable</h1>
+
+
+<div class="mb-3 d-flex gap-2 justify-content-between align-items-center">
+
+    <div class="head-left-side d-flex gap-2">
+    <button class="btn btn-primary" @onclick="ManejarClickListar">Listar</button>
+    <button class="btn btn-primary" @onclick="() => CargarVariablesPorNombre(nombreConsulta)">Consultar</button>
+    <input type="text" class="form-control" id="iptConsultar" placeholder="Consultar Variable / Nombre" @bind="nombreConsulta" />
+    </div>
+
+    <div class="head-right-side">
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#crearModel" @onclick="(() => formularioVariable = new FormularioVariable())">Crear</button>
+
+        <div class="modal fade" id="crearModel" tabindex="-1" aria-labelledby="crearModelLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="crearModelLabel">Crear Variable</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="(() => formularioVariable = new FormularioVariable())"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@formularioVariable" OnValidSubmit="CrearVariable">
+                        
+                        <div class="mb-3">
+                        <label for="iptNombre">Ingrese el Nombre: </label>
+                        <input type="text" placeholder="x" class="form-control" id="iptNombre" @bind="@formularioVariable.nombre"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sltUsuario">Seleccione al Usuario: </label>
+                            <select name="sltUsuario" id="sltUsuario" class="form-select" @bind="@formularioVariable.fkEmailUsuario">
+                                @if (usuarios != null && usuarios.Count > 0)
+                                {
+                                    <option value="" disabled selected>Seleccione un Usuario</option>
+                                    foreach (var usu in usuarios)
+                                    {
+                                        var email = ObtenerValor(usu, "email");
+                                        <option value="@email">@email</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled selected>No hay Usuarios disponibles</option>
+                                }
+                            </select>
+                        </div>
+
+                    </EditForm>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="(() => formularioVariable = new FormularioVariable())">Cerrar</button>
+                    <button type="button" class="btn btn-success" disabled="@(usuarios == null || usuarios.Count == 0)" @onclick="CrearVariable" >Guardar</button>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@if (Cargando)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+
+    @if (CargarTabla && variables != null && variables.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Nombre</th>
+                        <th>Fecha de Creación</th>
+                        <th>Usuario</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var Vari in variables)
+                    {
+                            var idVari = ObtenerValor(Vari, "id");
+                            var nombreVari = ObtenerValor(Vari, "nombre");
+                            var fechaCreacion = ObtenerValor(Vari, "fechacreacion");
+                            var fkEmailUsuario = ObtenerValor(Vari, "fkemailusuario");
+                        <tr>
+                            <td>@ObtenerValor(Vari, "id")</td>
+                            <td>@ObtenerValor(Vari, "nombre")</td>
+                            <td>@ObtenerValor(Vari, "fechacreacion")</td>
+                            <td>@ObtenerValor(Vari, "fkemailusuario")</td>
+                            <td>
+                                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="@($"#{nombreVari.Replace(" ", "")}{idVari}Modal")"
+                                    @onclick="@(async () => {
+                                        formularioVariable.id = idVari;
+                                        formularioVariable.nombre = nombreVari;
+                                        formularioVariable.fkEmailUsuario = fkEmailUsuario;
+                                        await Task.CompletedTask;
+                                    })">
+                                    Editar
+                                </button>
+
+                                <div class="modal fade" id="@($"{nombreVari.Replace(" ", "")}{idVari}Modal")" tabindex="-1"
+                                    aria-labelledby="@($"{nombreVari.Replace(" ", "")}{idVari}ModalLabel")" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="@($"{nombreVari.Replace(" ", "")}{idVari}ModalLabel")">
+                                                     Actualizando Variable: @nombreVari
+                                                </h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close" @onclick="(() => formularioVariable = new FormularioVariable())"></button>
+                                            </div>
+                                            <div class="modal-body">
+
+                                                <EditForm Model="@formularioVariable" OnValidSubmit="ActualizarVariable">
+                                                
+                                                    <div class="mb-3">
+                                                        <label for="iptNombre">Ingrese el Nombre: </label>
+                                                        <input type="text" placeholder="x" class="form-control" id="iptNombre" @bind="@formularioVariable.nombre"/>
+                                                    </div>
+                                                        <div class="mb-3">
+                                                            <label for="sltUsuario">Seleccione el Usuario: </label>
+                                                            <select name="sltUsuario" id="sltUsuario" class="form-select" @bind="@formularioVariable.fkEmailUsuario">
+                                                                <option value="" disabled >Seleccione un Usuario</option>
+                                                                @if (usuarios != null && usuarios.Count > 0)
+                                                                {
+                                                                    foreach (var usu in usuarios)
+                                                                    {
+                                                                        var email = ObtenerValor(usu, "email");
+                                                                        <option value="@email">@email</option>
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option value="" disabled >No hay Usuarios disponibles</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                </EditForm>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="(() => formularioVariable = new FormularioVariable())">Cerrar</button>
+                                                <button type="button" class="btn btn-success" disabled="@(usuarios == null || usuarios.Count == 0)" @onclick="ActualizarVariable" >Guardar</button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-danger" @onclick="@( () =>  ManejarClickEliminar(idVari))">Eliminar</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if ((variables == null || variables.Count == 0) && CargarTabla)
+    {
+        <p>No hay variables disponibles.</p>
+    }
+
+}
+
+<!-- Mostrar mensaje de error si existe -->
+@if (mensaje != null)
+{
+    <div class="alert alert-secondary m-3">
+        @mensaje
+    </div>
+}
+
+
+
+@code {
+
+    // Variables para almacenar las listas
+    private List<Dictionary<string, object>> variables = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> usuarios = new List<Dictionary<string, object>>();
+
+    // Variable para almacenar el formulario
+    private FormularioVariable formularioVariable = new FormularioVariable();
+
+    // Variable para almacenar mensajes de error
+    private string? mensaje = null;
+
+    // Constantes para los parámetros de la API
+    private const string PROYECTO = "proyecto";
+    private const string TABLA = "variable";
+
+    // Variable para almacenar el nombre a consultar
+    private string nombreConsulta = string.Empty;
+
+    // Variables visibilidad
+    private bool Cargando = true;
+    private bool CargarTabla = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarUsuarios();
+        await CargarVariables();
+    }
+
+    private class FormularioVariable
+    {
+        public string id { get; set; } = "";
+        public string nombre { get; set; } = "";
+        public string fechaCreacion { get; set; } = "";
+        public string fkEmailUsuario { get; set; } = "";
+    }
+
+    private async void ManejarClickListar()
+    {
+        mensaje = null;
+        await CargarVariables();
+        StateHasChanged();
+    }
+
+    private async void ManejarClickEliminar(string id)
+    {
+        mensaje = null;
+        var confirmar = await JS.InvokeAsync<bool>("confirm", "¿Está seguro de que desea eliminar esta Variable?");
+        if (!confirmar)
+        {
+            return;
+        }
+        await EliminarVariable(id);
+    }
+
+    private async Task CargarVariables()
+    {
+        Cargando = true;
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", "SELECT dbo.variable.id, dbo.variable.nombre, dbo.variable.fechacreacion, dbo.variable.fkemailusuario FROM dbo.usuario INNER JOIN dbo.variable ON dbo.usuario.email = dbo.variable.fkemailusuario" } });
+            if (resultado != null)
+            {
+                variables = resultado;
+
+            }   
+            else
+            {
+                variables = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar variables: {ex.Message}";
+            variables = new List<Dictionary<string, object>>();
+        }
+        finally
+        {
+            Cargando = false;
+            CargarTabla = true;
+        }
+    }
+
+    private async Task CargarUsuarios()
+    {
+        Cargando = true;
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "usuario");
+            if (resultado != null)
+            {
+                usuarios = resultado;
+            }
+            else
+            {
+                usuarios = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Usuarios: {ex.Message}";
+            usuarios = new List<Dictionary<string, object>>();
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+
+    private async Task CrearVariable()
+    {
+        Cargando = true;
+
+        mensaje = null;
+
+        try
+        {
+
+            var resultado = await servicioEntidad.CrearAsync(PROYECTO, TABLA, new Dictionary<string, object>(){ { "nombre", formularioVariable.nombre }, { "fkemailusuario", formularioVariable.fkEmailUsuario }});
+
+            if (resultado)
+            {
+                mensaje = "Variable creada con éxito";
+                await CargarVariables();
+                StateHasChanged();
+                formularioVariable = new FormularioVariable();
+            }
+            else
+            {
+                mensaje = "Error al crear Variable";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al crear Variable: {ex.Message}";
+        }
+        finally
+        {
+            Cargando = false;
+        }
+
+    }
+
+    private async Task EliminarVariable(string id)
+    {
+
+        mensaje = null;
+
+        try
+        {
+
+            var resultado = await servicioEntidad.EliminarAsync(PROYECTO, TABLA, "id", id);
+
+            if (resultado)
+            {
+                mensaje = "Variable eliminada con éxito";
+                await CargarVariables();
+                StateHasChanged();
+                formularioVariable = new FormularioVariable();
+            }
+            else
+            {
+                mensaje = "Error al eliminar Variable";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al eliminar Variable: {ex.Message}";
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+
+    private async Task ActualizarVariable()
+    {
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.ActualizarAsync(PROYECTO, TABLA, "id", formularioVariable.id, new Dictionary<string, object>() { { "nombre", formularioVariable.nombre }, { "fkemailusuario", formularioVariable.fkEmailUsuario } });
+
+            if (resultado)
+            {
+                mensaje = "Variable actualizada con éxito";
+                await CargarVariables();
+                StateHasChanged();
+                formularioVariable = new FormularioVariable();
+            }
+            else
+            {
+                mensaje = "Error al actualizar Variable";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al actualizar Variable: {ex.Message}";
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+
+    private async Task CargarVariablesPorNombre(string nombre)
+    {
+        Cargando = true;
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", $"SELECT dbo.variable.nombre, dbo.variable.fechacreacion, dbo.variable.fkemailusuario FROM dbo.usuario INNER JOIN dbo.variable ON dbo.usuario.email = dbo.variable.fkemailusuario WHERE dbo.variable.nombre LIKE '%{nombre}%'"} });
+            if (resultado != null)
+            {
+                variables = resultado;
+                nombreConsulta = string.Empty;
+            }
+            else
+            {
+                variables = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Variables: {ex.Message}";
+            variables = new List<Dictionary<string, object>>();
+        }
+        finally
+        {
+            Cargando = false;
+            CargarTabla = true;
+        }
+    }
+
+    private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
+    {
+
+        if (diccionario == null)
+            return string.Empty;
+
+        if (diccionario.TryGetValue(clave, out var valor))
+        {
+            return valor?.ToString() ?? string.Empty;
+        }
+
+        return string.Empty;
+    }
+
+}
