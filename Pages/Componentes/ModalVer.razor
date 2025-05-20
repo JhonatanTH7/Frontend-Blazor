@@ -1,0 +1,75 @@
+@typeparam TItem
+
+<div>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#@IdModal"
+        @onclick="HandleClick">
+        Ver
+    </button>
+
+    <div class="modal fade" id="@IdModal" tabindex="-1" aria-labelledby="@($"{IdModal}Label")">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="@($"{IdModal}Label")">@Titulo</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (Items != null && Items.Any())
+                    {
+                        <ul>
+                            @foreach (var item in Items)
+                            {
+                                if (item is Dictionary<string, object> dic)
+                                {
+                                    <li class="text-start">@ObtenerValor(dic, CampoPrimario)
+                                        @if (CampoSecundario != "null")
+                                        {
+                                            <span> - @ObtenerValor(dic, CampoSecundario)</span>
+                                        }
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span>No hay datos asignados.</span>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<TItem>? Items { get; set; }
+    [Parameter] public string CampoPrimario { get; set; } = "nombre";
+    [Parameter] public string CampoSecundario { get; set; } = "null";
+    [Parameter] public string Titulo { get; set; } = "Detalle";
+    [Parameter] public string IdModal { get; set; } = "sharedModal";
+    [Parameter] public EventCallback OnVerClick { get; set; }
+
+    private async Task HandleClick()
+    {
+        if (OnVerClick.HasDelegate)
+        {
+            await OnVerClick.InvokeAsync();
+        }
+    }
+
+    private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
+    {
+        if (diccionario == null)
+            return string.Empty;
+
+        if (diccionario.TryGetValue(clave, out var valor))
+        {
+            return valor?.ToString() ?? string.Empty;
+        }
+
+        return string.Empty;
+    }
+}

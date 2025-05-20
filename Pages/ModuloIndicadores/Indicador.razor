@@ -1,0 +1,450 @@
+<!--  Define la ruta URL para acceder a esta página -->
+@page "/indicador"
+
+<!--  Importa el espacio de nombres para trabajar con JSON -->
+@using Services
+
+@using FrontBlazor.Pages.Componentes
+
+<!--  Importa el espacio de nombres donde se encuentra el ServicioEntidad-->
+@inject ServicioEntidad servicioEntidad
+@inject IJSRuntime JS
+
+<PageTitle>Indicador</PageTitle>
+
+<h1>Indicador</h1>
+
+
+
+<div class="mb-3 d-flex gap-2 justify-content-between align-items-center">
+
+    <div class="head-left-side d-flex gap-2">
+        <button class="btn btn-primary" @onclick="ManejarClickListar">Listar</button>
+        <button class="btn btn-primary" @onclick="() => CargarIndicadoresPorNombre(nombreConsulta)">Consultar</button>
+        <input type="text" class="form-control" id="iptConsultar" placeholder="Consultar Indicador/Nombre"
+            @bind="nombreConsulta" />
+    </div>
+
+    <div class="head-right-side">
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#crearModel">Crear</button>
+    </div>
+
+</div>
+
+
+
+@if (Cargando)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+
+    @if (CargarTabla && indicadores != null && indicadores.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-striped text-center">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Codigo</th>
+                        <th>Nombre</th>
+                        <th>Objetivo</th>
+                        <th>Alcance</th>
+                        <th>Formula</th>
+                        <th>Meta</th>
+                        <th>Tipo Indicador</th>
+                        <th>Unidad Medicion</th>
+                        <th>Sentido</th>
+                        <th>Frecuencia</th>
+                        <th>Articulo</th>
+                        <th>Literal</th>
+                        <th>Numeral</th>
+                        <th>Paragrafo</th>
+                        <th>Represenvisualporindicador</th>
+                        <th>Responsablesporindicador</th>
+                        <th>Fuentesporindicador</th>
+                        <th>Variablesporindicador</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var indicador in indicadores)
+                    {
+                        var id = ObtenerValor(indicador, "id");
+                        var codigo = ObtenerValor(indicador, "codigo");
+                        var nombre = ObtenerValor(indicador, "nombre");
+                        var objetivo = ObtenerValor(indicador, "objetivo");
+                        var alcance = ObtenerValor(indicador, "alcance");
+                        var formula = ObtenerValor(indicador, "formula");
+                        var meta = ObtenerValor(indicador, "meta");
+                        var nombretipoindicador = ObtenerValor(indicador, "nombretipoindicador");
+                        var descripcionunidadmedicion = ObtenerValor(indicador, "descripcionunidadmedicion");
+                        var nombresentido = ObtenerValor(indicador, "nombresentido");
+                        var nombrefrecuencia = ObtenerValor(indicador, "nombrefrecuencia");
+                        var nombrearticulo = ObtenerValor(indicador, "nombrearticulo");
+                        var descripcionliteral = ObtenerValor(indicador, "descripcionliteral");
+                        var descripcionnumeral = ObtenerValor(indicador, "descripcionnumeral");
+                        var descripcionparagrafo = ObtenerValor(indicador, "descripcionparagrafo");
+
+
+                        <tr>
+                            <td>@id</td>
+                            <td>@codigo</td>
+                            <td>@nombre</td>
+                            <td>@objetivo</td>
+                            <td>@alcance</td>
+                            <td>@formula</td>
+                            <td>@meta</td>
+                            <td>@nombretipoindicador</td>
+                            <td>@descripcionunidadmedicion</td>
+                            <td>@nombresentido</td>
+                            <td>@nombrefrecuencia</td>
+                            <td>@nombrearticulo</td>
+                            <td>@descripcionliteral</td>
+                            <td>@descripcionnumeral</td>
+                            <td>@descripcionparagrafo</td>
+                            <td>
+                                 <ModalVer TItem="Dictionary<string, object>" 
+                                    Items="represenvisualporindicador"
+                                    CampoPrimario="nombre"
+                                    Titulo="@($"Represenvisuales del indicador: {nombre}")"
+                                    OnVerClick="() => CargarRepresenvisualporindicador(id)" 
+                                    IdModal="@($"Represen{id}{nombre.Replace(" ","")}Modal")"/>                                
+                            </td>
+                            <td>
+                                <ModalVer TItem="Dictionary<string, object>" 
+                                    Items="responsablesporindicador"
+                                    CampoPrimario="nombre"
+                                    Titulo="@($"Responsables del indicador: {nombre}")"
+                                    OnVerClick="() => CargarResponsablesporindicador(id)" 
+                                    IdModal="@($"Responsable{id}{nombre.Replace(" ","")}Modal")"/>
+                            </td>
+                            <td>
+                                <ModalVer TItem="Dictionary<string, object>" 
+                                    Items="fuentesporindicador"
+                                    CampoPrimario="nombre"
+                                    Titulo="@($"Fuentes del indicador: {nombre}")"
+                                    OnVerClick="() => CargarFuentesporindicador(id)" 
+                                    IdModal="@($"Fuente{id}{nombre.Replace(" ","")}Modal")"/>
+                            </td>
+                            <td>
+                                <ModalVer TItem="Dictionary<string, object>" 
+                                    Items="variablesporindicador"
+                                    CampoPrimario="nombre"
+                                    CampoSecundario="dato"
+                                    Titulo="@($"Variables del indicador: {nombre}")"
+                                    OnVerClick="() => CargarVariablesporindicador(id)" 
+                                    IdModal="@($"Variable{id}{nombre.Replace(" ","")}Modal")"/>
+                            </td>
+                            <td class="text-no-wrap">
+                                 <button class="btn btn-warning">
+                                    Editar
+                                </button>
+                                <button class="btn btn-danger" @onclick="@( () =>  ManejarClickEliminar(id))">Eliminar</button>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if ((indicadores == null || indicadores.Count == 0) && CargarTabla)
+    {
+        <p>No hay Indicadores disponibles.</p>
+    }
+
+}
+
+<!-- Mostrar mensaje de error si existe -->
+@if (mensaje != null)
+{
+    <div class="alert alert-secondary m-3">
+        @mensaje
+    </div>
+}
+
+
+
+
+
+
+@code {
+
+    // Variables para almacenar las listas
+    private List<Dictionary<string, object>> indicadores = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> responsablesporindicador = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> fuentesporindicador = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> variablesporindicador = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> represenvisualporindicador = new List<Dictionary<string, object>>();
+    // Variable para almacenar el formulario
+    private FormularioIndicador formularioIndicador = new FormularioIndicador();
+    // Variable para almacenar mensajes de error
+    private string? mensaje = null;
+
+    // Constantes para los parámetros de la API
+    private const string PROYECTO = "proyecto";
+    private const string TABLA = "indicador";
+
+    // Variable para almacenar el nombre a consultar
+    private string nombreConsulta = string.Empty;
+
+    // Variables visibilidad
+    private bool Cargando = true;
+    private bool CargarTabla = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarIndicadores();
+    }
+
+    private class FormularioIndicador
+    {
+        public string id { get; set; } = "";
+        public string codigo { get; set; } = "";
+        public string nombre { get; set; } = "";
+        public string objetivo { get; set; } = "";
+        public string alcance { get; set; } = "";
+        public string formula { get; set; } = "";
+        public string meta { get; set; } = "";
+        public string fkidtipoindicador { get; set; } = "";
+        public string fkidunidadmedicion { get; set; } = "";
+        public string fkidsentido { get; set; } = "";
+        public string fkidfrecuencia { get; set; } = "";
+        public string fkidarticulo { get; set; } = "";
+        public string fkidliteral { get; set; } = "";
+        public string fkidnumeral { get; set; } = "";
+        public string fkidparagrafo { get; set; } = "";
+    }
+
+    private async void ManejarClickListar()
+    {
+        mensaje = null;
+        await CargarIndicadores();
+        StateHasChanged();
+    }
+
+     private async void ManejarClickEliminar(string id)
+    {
+        mensaje = null;
+        var confirmar = await JS.InvokeAsync<bool>("confirm", "¿Está seguro de que desea eliminar este Indicador?");
+        if (!confirmar)
+        {
+            return;
+        }
+        await EliminarIndicador(id);
+    }
+
+    private async Task CargarIndicadores()
+    {
+        Cargando = true;
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { {"consulta", "SELECT i.id, i.nombre, i.codigo, i.objetivo, i.alcance, i.formula, i.fkidtipoindicador, i.fkidunidadmedicion, i.meta, i.fkidsentido, i.fkidfrecuencia, i.fkidarticulo, i.fkidliteral, i.fkidnumeral, i.fkidparagrafo, ti.nombre as nombretipoindicador, u.descripcion as descripcionunidadmedicion, s.nombre as nombresentido, f.nombre as nombrefrecuencia, a.nombre as nombrearticulo, l.descripcion as descripcionliteral, n.descripcion as descripcionnumeral, p.descripcion as descripcionparagrafo FROM dbo.indicador i LEFT JOIN dbo.articulo a ON a.id = i.fkidarticulo LEFT JOIN dbo.frecuencia f ON i.fkidfrecuencia = f.id LEFT JOIN dbo.literal l ON l.id = i.fkidliteral AND l.fkidarticulo = i.fkidarticulo LEFT JOIN dbo.numeral n ON n.id = i.fkidnumeral AND n.fkidliteral = i.fkidliteral LEFT JOIN dbo.paragrafo p ON p.id = i.fkidparagrafo AND p.fkidarticulo = i.fkidarticulo LEFT JOIN dbo.sentido s ON s.id = i.fkidsentido LEFT JOIN dbo.tipoindicador ti ON ti.id = i.fkidtipoindicador LEFT JOIN dbo.unidadmedicion u ON u.id = i.fkidunidadmedicion;" } });
+            if (resultado != null)
+            {
+                indicadores = resultado;
+            }
+            else
+            {
+                indicadores = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar indicadores: {ex.Message}";
+            indicadores = new List<Dictionary<string, object>>();
+        }
+        finally
+        {
+            Cargando = false;
+            CargarTabla = true;
+        }
+    }
+
+    private async Task EliminarIndicador(string id)
+    {
+
+        mensaje = null;
+
+        try
+        {
+
+            var resultado = await servicioEntidad.EliminarAsync(PROYECTO, TABLA, "id", id);
+
+            if (resultado)
+            {
+                await CargarIndicadores();
+                StateHasChanged();
+                formularioIndicador = new FormularioIndicador();
+                mensaje = "Actor eliminado con éxito";
+            }
+            else
+            {
+                mensaje = "Error al eliminar Actor";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al eliminar Actor: {ex.Message}";
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+
+    private async Task CargarIndicadoresPorNombre(string nombre)
+    {
+        Cargando = true;
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", $"SELECT i.id, i.nombre, i.codigo, i.objetivo, i.alcance, i.formula, i.fkidtipoindicador, i.fkidunidadmedicion, i.meta, i.fkidsentido, i.fkidfrecuencia, i.fkidarticulo, i.fkidliteral, i.fkidnumeral, i.fkidparagrafo, ti.nombre as nombretipoindicador, u.descripcion as descripcionunidadmedicion, s.nombre as nombresentido, f.nombre as nombrefrecuencia, a.nombre as nombrearticulo, l.descripcion as descripcionliteral, n.descripcion as descripcionnumeral, p.descripcion as descripcionparagrafo FROM dbo.indicador i LEFT JOIN dbo.articulo a ON a.id = i.fkidarticulo LEFT JOIN dbo.frecuencia f ON i.fkidfrecuencia = f.id LEFT JOIN dbo.literal l ON l.id = i.fkidliteral AND l.fkidarticulo = i.fkidarticulo LEFT JOIN dbo.numeral n ON n.id = i.fkidnumeral AND n.fkidliteral = i.fkidliteral LEFT JOIN dbo.paragrafo p ON p.id = i.fkidparagrafo AND p.fkidarticulo = i.fkidarticulo LEFT JOIN dbo.sentido s ON s.id = i.fkidsentido LEFT JOIN dbo.tipoindicador ti ON ti.id = i.fkidtipoindicador LEFT JOIN dbo.unidadmedicion u ON u.id = i.fkidunidadmedicion WHERE i.nombre LIKE '%{nombre}%'" } });
+            if (resultado != null)
+            {
+                indicadores = resultado;
+                nombreConsulta = string.Empty;
+            }
+            else
+            {
+                indicadores = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar indicadores: {ex.Message}";
+            indicadores = new List<Dictionary<string, object>>();
+        }
+        finally
+        {
+            Cargando = false;
+            CargarTabla = true;
+        }
+    }
+
+    private async Task CargarRepresenvisualporindicador(string id)
+    {
+        mensaje = null;
+
+        represenvisualporindicador = new List<Dictionary<string, object>>();
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", $"SELECT rv.nombre FROM dbo.represenvisualporindicador rvpi INNER JOIN dbo.represenvisual rv ON rv.id = rvpi.fkidrepresenvisual  WHERE rvpi.fkidindicador = {id}" } });
+            if (resultado != null)
+            {
+                represenvisualporindicador = resultado;   
+            }
+            else
+            {
+                represenvisualporindicador = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Represenvisualporindicador: {ex.Message}";
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private async Task CargarResponsablesporindicador(string id)
+    {
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", $"SELECT dbo.actor.nombre FROM dbo.actor INNER JOIN dbo.responsablesporindicador ON dbo.actor.id = dbo.responsablesporindicador.fkidresponsable WHERE dbo.responsablesporindicador.fkidindicador = {id}" } });
+            if (resultado != null)
+            {
+                responsablesporindicador = resultado;
+            }
+            else
+            {
+                responsablesporindicador = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Responsablesporindicador: {ex.Message}";
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private async Task CargarFuentesporindicador(string id)
+    {
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", $"SELECT dbo.fuente.nombre FROM dbo.fuente INNER JOIN dbo.fuentesporindicador ON dbo.fuente.id = dbo.fuentesporindicador.fkidfuente WHERE dbo.fuentesporindicador.fkidindicador = {id}" } });
+            if (resultado != null)
+            {
+                fuentesporindicador = resultado;
+            }
+            else
+            {
+                fuentesporindicador = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Fuentesporindicador: {ex.Message}";
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private async Task CargarVariablesporindicador(string id)
+    {
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", $"SELECT dbo.variable.nombre, dbo.variablesporindicador.dato FROM dbo.variable INNER JOIN dbo.variablesporindicador ON dbo.variable.id = dbo.variablesporindicador.fkidvariable WHERE dbo.variablesporindicador.fkidindicador = {id}" } });
+            if (resultado != null)
+            {
+                variablesporindicador = resultado;
+            }
+            else
+            {
+                variablesporindicador = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Variablesporindicador: {ex.Message}";
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
+    {
+
+        if (diccionario == null)
+            return string.Empty;
+
+        if (diccionario.TryGetValue(clave, out var valor))
+        {
+            return valor?.ToString() ?? string.Empty;
+        }
+
+        return string.Empty;
+    }
+
+}
