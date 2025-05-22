@@ -1,21 +1,22 @@
 @page "/login"
 @using Services
-@layout EmptyLayout  
+@layout EmptyLayout
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 
 <style>
-    body{
-	margin: 0;
-	padding: 0;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	min-height: 100vh;
-	font-family: 'Jost', sans-serif;
-	background: linear-gradient(to bottom, #0c0f2c, #3a1d77, #5e35b1);
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: 'Jost', sans-serif;
+        background: linear-gradient(to bottom, #0c0f2c, #3a1d77, #5e35b1);
     }
-    .main{
+
+    .main {
         width: 350px;
         height: 500px;
         background: red;
@@ -24,15 +25,18 @@
         border-radius: 10px;
         box-shadow: 5px 20px 50px #000;
     }
-    #chk{
+
+    #chk {
         display: none;
     }
-    .signup{
+
+    .signup {
         position: relative;
-        width:100%;
+        width: 100%;
         height: 100%;
     }
-    label{
+
+    label {
         color: #fff;
         font-size: 2.3em;
         justify-content: center;
@@ -42,7 +46,8 @@
         cursor: pointer;
         transition: .5s ease-in-out;
     }
-    input{
+
+    input {
         width: 60%;
         height: 20px;
         background: #e0dede;
@@ -54,7 +59,8 @@
         outline: none;
         border-radius: 5px;
     }
-    button{
+
+    button {
         width: 60%;
         height: 40px;
         margin: 10px auto;
@@ -71,39 +77,43 @@
         transition: .2s ease-in;
         cursor: pointer;
     }
-    button:hover{
+
+    button:hover {
         background: #black;
     }
-    .login{
+
+    .login {
         height: 460px;
         background: #eee;
         border-radius: 60% / 10%;
         transform: translateY(-180px);
         transition: .8s ease-in-out;
     }
-    .login label{
+
+    .login label {
         color: #573b8a;
         transform: scale(.6);
     }
 
-    #chk:checked ~ .login{
+    #chk:checked~.login {
         transform: translateY(-500px);
     }
-    #chk:checked ~ .login label{
-        transform: scale(1);	
-    }
-    #chk:checked ~ .signup label{
-        transform: scale(.6);
+
+    #chk:checked~.login label {
+        transform: scale(1);
     }
 
+    #chk:checked~.signup label {
+        transform: scale(.6);
+    }
 </style>
-<div class="main">      
+<div class="main">
     <input type="checkbox" id="chk" aria-hidden="true">
 
     <div class="signup">
         <form @onsubmit="CrearUsuario">
             <label for="chk" aria-hidden="true">Crear Usuario</label>
-            <input type="email" @bind="NuevoUsuario.Email" placeholder="Email" required>                
+            <input type="email" @bind="NuevoUsuario.Email" placeholder="Email" required>
             <input type="password" @bind="NuevoUsuario.Password" placeholder="Password" required>
             <input type="password" @bind="NuevoUsuario.ConfPass" placeholder="confirm password" required>
             <button type="submit">Crear</button>
@@ -121,8 +131,8 @@
             <input type="email" @bind="UsuarioLogin.Email" placeholder="Email" required>
             <input type="password" @bind="UsuarioLogin.Password" placeholder="Password" required>
             <button type="submit">Login</button>
-            
-        </form>            
+
+        </form>
     </div>
 </div>
 
@@ -139,7 +149,7 @@
             if (NuevoUsuario.Password != NuevoUsuario.ConfPass)
             {
                 ErrorMensaje = "Las contraseñas no coinciden.";
-                return;              
+                return;
             }
             else
             {
@@ -153,10 +163,10 @@
                 {
                     // Manejar éxito
                     Console.WriteLine("Usuario creado exitosamente.");
-                    NavigationManager.NavigateTo("/Home", replace: true);
+                    NavigationManager.NavigateTo("/home", replace: true);
                 }
             }
-            
+
         }
         catch (Exception ex)
         {
@@ -187,7 +197,7 @@
             {
                 // Manejar error
                 Console.WriteLine("Error al iniciar sesión.");
-                
+
             }
         }
         catch (Exception ex)
@@ -202,6 +212,6 @@
         public string? Password { get; set; }
         public string? ConfPass { get; set; }
 
-        
+
     }
 }

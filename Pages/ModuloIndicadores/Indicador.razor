@@ -26,10 +26,240 @@
     </div>
 
     <div class="head-right-side">
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#crearModel">Crear</button>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#crearModal1" @onclick="ManejarClickCrear" >Crear</button>
+        <div class="modal fade" id="crearModal1" aria-hidden="true" aria-labelledby="crearModal1Label" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="crearModal1Label">Agregando Indicador: Pg. 1</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="iptCodigo" class="form-label">Codigo</label>
+                            <input type="text" class="form-control" id="iptCodigo" placeholder="COD 000"
+                                @bind="@formularioIndicador.codigo" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="iptNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="iptNombre" placeholder="NPM 000"
+                                @bind="@formularioIndicador.nombre" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="iptObjetivo" class="form-label">Objetivo</label>
+                            <input type="text" class="form-control" id="iptObjetivo" placeholder="Objetivo"
+                                @bind="@formularioIndicador.objetivo" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="iptAlcance" class="form-label">Alcance</label>
+                            <input type="text" class="form-control" id="iptAlcance" placeholder="Alcance"
+                                @bind="@formularioIndicador.alcance" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="iptFormula" class="form-label">Formula</label>
+                            <input type="text" class="form-control" id="iptFormula" placeholder="Formula"
+                                @bind="@formularioIndicador.formula" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="iptMeta" class="form-label">Meta</label>
+                            <input type="text" class="form-control" id="iptMeta" placeholder="Meta"
+                                @bind="@formularioIndicador.meta" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" data-bs-target="#crearModal2" data-bs-toggle="modal">Siguiente</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="crearModal2" aria-hidden="true" aria-labelledby="crearModal2Label" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="crearModal2Label">Agregando Indicador: Pg. 2</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="sltTipoActor">Seleccione el Tipo de Indicador: </label>
+                            <select name="sltTipoActor" id="sltTipoActor" class="form-select" @bind="@formularioIndicador.fkidtipoindicador">
+                                @if (tiposIndicador != null && tiposIndicador.Count > 0)
+                                {
+                                    <option value="" disabled selected>Seleccione un Tipo de Indicador</option>
+                                    foreach (var tipo in tiposIndicador)
+                                    {
+                                        var idTipo = ObtenerValor(tipo, "id");
+                                        var nombreTipo = ObtenerValor(tipo, "nombre");
+                                        <option value="@idTipo">@nombreTipo</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled selected>No hay tipos de actores disponibles</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sltUnidadMedicion">Seleccione la Unidad de Medición: </label>
+                            <select name="sltUnidadMedicion" id="sltUnidadMedicion" class="form-select" @bind="@formularioIndicador.fkidunidadmedicion">
+                                @if (unidadesMedicion != null && unidadesMedicion.Count > 0)
+                                {
+                                    <option value="" disabled selected>Seleccione una Unidad de Medición</option>
+                                    foreach (var unidad in unidadesMedicion)
+                                    {
+                                        var idUnidad = ObtenerValor(unidad, "id");
+                                        var descripcionUnidad = ObtenerValor(unidad, "descripcion");
+                                        <option value="@idUnidad">@descripcionUnidad</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled selected>No hay tipos de actores disponibles</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sltSentido">Seleccione el Sentido: </label>
+                            <select name="sltSentido" id="sltSentido" class="form-select" @bind="@formularioIndicador.fkidsentido">
+                                @if (sentidos != null && sentidos.Count > 0)
+                                {
+                                    <option value="" disabled selected>Seleccione un Sentido</option>
+                                    foreach (var sentido in sentidos)
+                                    {
+                                        var idSentido = ObtenerValor(sentido, "id");
+                                        var nombreSentido = ObtenerValor(sentido, "nombre");
+                                        <option value="@idSentido">@nombreSentido</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled selected>No hay tipos de actores disponibles</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sltFrecuencia">Seleccione la Frecuencia: </label>
+                            <select name="sltFrecuencia" id="sltFrecuencia" class="form-select" @bind="@formularioIndicador.fkidfrecuencia">
+                                @if (frecuencias != null && frecuencias.Count > 0)
+                                {
+                                    <option value="" disabled selected>Seleccione una Frecuencia</option>
+                                    foreach (var frecuencia in frecuencias)
+                                    {
+                                        var idFrecuencia = ObtenerValor(frecuencia, "id");
+                                        var nombreFrecuencia = ObtenerValor(frecuencia, "nombre");
+                                        <option value="@idFrecuencia">@nombreFrecuencia</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled selected>No hay tipos de actores disponibles</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sltArticulo">Seleccione el Articulo: </label>
+                            <select name="sltArticulo" id="sltArticulo" class="form-select" @bind="@formularioIndicador.fkidarticulo">
+                                @if (articulos != null && articulos.Count > 0)
+                                {
+                                    <option value="" disabled selected>Seleccione un Articulo</option>
+                                    foreach (var articulo in articulos)
+                                    {
+                                        var idArticulo = ObtenerValor(articulo, "id");
+                                        var nombreArticulo = ObtenerValor(articulo, "nombre");
+                                        <option value="@idArticulo">@nombreArticulo</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled selected>No hay tipos de actores disponibles</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sltLiteral">Seleccione el Literal: </label>
+                            <select name="sltLiteral" id="sltLiteral" class="form-select" @bind="@formularioIndicador.fkidliteral">
+                                @if (literales != null && literales.Count > 0)
+                                {
+                                    <option value="" disabled selected>Seleccione un Literal</option>
+                                    foreach (var literal in literales)
+                                    {
+                                        var idLiteral = ObtenerValor(literal, "id");
+                                        var descripcionLiteral = ObtenerValor(literal, "descripcion");
+                                        <option value="@idLiteral">@descripcionLiteral</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled selected>No hay tipos de actores disponibles</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sltNumeral">Seleccione el Numeral: </label>
+                            <select name="sltNumeral" id="sltNumeral" class="form-select" @bind="@formularioIndicador.fkidnumeral">
+                                @if (numerales != null && numerales.Count > 0)
+                                {
+                                    <option value="" disabled selected>Seleccione un Numeral</option>
+                                    foreach (var numeral in numerales)
+                                    {
+                                        var idNumeral = ObtenerValor(numeral, "id");
+                                        var descripcionNumeral = ObtenerValor(numeral, "descripcion");
+                                        <option value="@idNumeral">@descripcionNumeral</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled selected>No hay tipos de actores disponibles</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="sltParagrafo">Seleccione el Paragrafo: </label>
+                            <select name="sltParagrafo" id="sltParagrafo" class="form-select" @bind="@formularioIndicador.fkidparagrafo">
+                                @if (paragrafos != null && paragrafos.Count > 0)
+                                {
+                                    <option value="" disabled selected>Seleccione un Paragrafo</option>
+                                    foreach (var paragrafo in paragrafos)
+                                    {
+                                        var idParagrafo = ObtenerValor(paragrafo, "id");
+                                        var descripcionParagrafo = ObtenerValor(paragrafo, "descripcion");
+                                        <option value="@idParagrafo">@descripcionParagrafo</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled selected>No hay tipos de actores disponibles</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" data-bs-target="#crearModal1" data-bs-toggle="modal">Anterior</button>
+                        <button class="btn btn-primary" data-bs-target="#crearModal3" data-bs-toggle="modal">Siguiente</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="crearModal3" aria-hidden="true" aria-labelledby="crearModal3Label" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="crearModal3Label">Agregando Indicador: Pg. 3</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Modal 3
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" data-bs-target="#crearModal2" data-bs-toggle="modal">Anterior</button>
+                        <button class="btn btn-primary" data-bs-target="#" data-bs-toggle="modal">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
 </div>
+
 
 
 
@@ -42,7 +272,7 @@ else
 
     @if (CargarTabla && indicadores != null && indicadores.Count > 0)
     {
-        <div class="table-responsive">
+        <div class="table-responsive tableContainer">
             <table class="table table-striped text-center">
                 <thead>
                     <tr>
@@ -137,11 +367,13 @@ else
                                     OnVerClick="() => CargarVariablesporindicador(id)" 
                                     IdModal="@($"Variable{id}{nombre.Replace(" ","")}Modal")"/>
                             </td>
-                            <td class="text-no-wrap">
+                            <td >
+                                <div class="d-flex gap-2 justify-content-center">
                                  <button class="btn btn-warning">
                                     Editar
                                 </button>
                                 <button class="btn btn-danger" @onclick="@( () =>  ManejarClickEliminar(id))">Eliminar</button>
+                                </div>
                             </td>
 
                         </tr>
@@ -178,6 +410,17 @@ else
     private List<Dictionary<string, object>> fuentesporindicador = new List<Dictionary<string, object>>();
     private List<Dictionary<string, object>> variablesporindicador = new List<Dictionary<string, object>>();
     private List<Dictionary<string, object>> represenvisualporindicador = new List<Dictionary<string, object>>();
+
+    private List<Dictionary<string, object>> tiposIndicador = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> unidadesMedicion = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> sentidos = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> frecuencias = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> articulos = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> literales = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> numerales = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> paragrafos = new List<Dictionary<string, object>>();
+
+    
     // Variable para almacenar el formulario
     private FormularioIndicador formularioIndicador = new FormularioIndicador();
     // Variable para almacenar mensajes de error
@@ -216,6 +459,21 @@ else
         public string fkidliteral { get; set; } = "";
         public string fkidnumeral { get; set; } = "";
         public string fkidparagrafo { get; set; } = "";
+    }
+
+    private async void ManejarClickCrear()
+    {
+        formularioIndicador = new FormularioIndicador();
+        mensaje = null;
+        await CargarTiposIndicador();
+        await CargarUnidadesMedicion();
+        await CargarSentidos();
+        await CargarFrecuencias();
+        await CargarArticulos();
+        await CargarLiterales();
+        await CargarNumerales();
+        await CargarParagrafos();
+        StateHasChanged();
     }
 
     private async void ManejarClickListar()
@@ -280,16 +538,16 @@ else
                 await CargarIndicadores();
                 StateHasChanged();
                 formularioIndicador = new FormularioIndicador();
-                mensaje = "Actor eliminado con éxito";
+                mensaje = "Indicador eliminado con éxito";
             }
             else
             {
-                mensaje = "Error al eliminar Actor";
+                mensaje = "Error al eliminar Indicador";
             }
         }
         catch (Exception ex)
         {
-            mensaje = $"Error al eliminar Actor: {ex.Message}";
+            mensaje = $"Error al eliminar Indicador: {ex.Message}";
         }
         finally
         {
@@ -324,6 +582,174 @@ else
         {
             Cargando = false;
             CargarTabla = true;
+        }
+    }
+
+    private async Task CargarTiposIndicador()
+    {
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "tipoindicador");
+            if (resultado != null)
+            {
+                tiposIndicador = resultado;
+            }
+            else
+            {
+                tiposIndicador = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Tipos de Indicador: {ex.Message}";
+        }
+    }
+
+    private async Task CargarUnidadesMedicion()
+    {
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "unidadmedicion");
+            if (resultado != null)
+            {
+                unidadesMedicion = resultado;
+            }
+            else
+            {
+                unidadesMedicion = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Unidades de Medición: {ex.Message}";
+        }
+    }
+
+    private async Task CargarSentidos()
+    {
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "sentido");
+            if (resultado != null)
+            {
+                sentidos = resultado;
+            }
+            else
+            {
+                sentidos = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Sentidos: {ex.Message}";
+        }
+    }
+
+    private async Task CargarFrecuencias()
+    {
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "frecuencia");
+            if (resultado != null)
+            {
+                frecuencias = resultado;
+            }
+            else
+            {
+                frecuencias = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Frecuencias: {ex.Message}";
+        }
+    }
+
+    private async Task CargarArticulos()
+    {
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "articulo");
+            if (resultado != null)
+            {
+                articulos = resultado;
+            }
+            else
+            {
+                articulos = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Articulos: {ex.Message}";
+        }
+    }
+
+    private async Task CargarLiterales()
+    {
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "literal");
+            if (resultado != null)
+            {
+                literales = resultado;
+            }
+            else
+            {
+                literales = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Literales: {ex.Message}";
+        }
+    }
+
+    private async Task CargarNumerales()
+    {
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "numeral");
+            if (resultado != null)
+            {
+                numerales = resultado;
+            }
+            else
+            {
+                numerales = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Numerales: {ex.Message}";
+        }
+    }
+
+    private async Task CargarParagrafos()
+    {
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "paragrafo");
+            if (resultado != null)
+            {
+                paragrafos = resultado;
+            }
+            else
+            {
+                paragrafos = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Paragrafos: {ex.Message}";
         }
     }
 

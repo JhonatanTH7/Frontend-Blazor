@@ -65,7 +65,7 @@ else
 
     @if (CargarTabla && secciones != null && secciones.Count > 0)
     {
-        <div class="table-responsive">
+        <div class="table-responsive tableContainer">
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -289,9 +289,9 @@ else
         try
         {
             var resultado = await servicioEntidad.CrearAsync(
-                PROYECTO, 
-                TABLA, 
-                new Dictionary<string, object>(){{ "descripcion", formulario.Nombre }});
+            PROYECTO,
+            TABLA,
+            new Dictionary<string, object>() { { "descripcion", formulario.Nombre } });
 
             if (resultado)
             {
@@ -377,18 +377,18 @@ formulario.Nombre }});
         }
     }
 
-     private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
+    private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
     {
 
-    if (diccionario == null)
-    return string.Empty;
+        if (diccionario == null)
+            return string.Empty;
 
-    if (diccionario.TryGetValue(clave, out var valor))
-    {
-    return valor?.ToString() ?? string.Empty;
-    }
+        if (diccionario.TryGetValue(clave, out var valor))
+        {
+            return valor?.ToString() ?? string.Empty;
+        }
 
-    return string.Empty;
+        return string.Empty;
     }
 
 }
