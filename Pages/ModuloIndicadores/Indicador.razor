@@ -248,11 +248,117 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Modal 3
+                        <fieldset class="border p-2 mb-3">
+                            <legend>Represenvisualporindicador</legend>
+                            <div class="mb-3 d-flex gap-2 justify-content-center" >
+                                <select class="form-select" @bind="@idRepresenIndicadorAgregar">
+                                    <option value="">Seleccione una Representación</option>
+                                    @foreach (var rep in represenvisual)
+                                    {
+                                        <option value="@ObtenerValor(rep, "id")">
+                                            @ObtenerValor(rep, "nombre")
+                                        </option>
+                                    }
+                                </select>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-primary" @onclick="AgregarRepresenvisual">Agregar</button>
+                                </div>
+                            </div>
+                            <ul class="list-group">
+                                @foreach (var item in represenvisualporindicador)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        @ObtenerValor(item,"fkidrepresenvisual") - Nombre: @ObtenerValor(item,"nombre")
+                                        <button type="button" class="btn btn-sm btn-danger" @onclick="() => EliminarElementoLista(item, represenvisualporindicador)">Remover</button>
+                                    </li>
+                                }
+                            </ul>
+                        </fieldset>
+                        <fieldset class="border p-2 mb-3">
+                            <legend>Responsablesporindicador</legend>
+                            <div class="mb-3 d-flex gap-2 justify-content-center" >
+                                <select class="form-select" @bind="@idResponsableAgregar">
+                                    <option value="">Seleccione un Responsable</option>
+                                    @foreach (var resp in responsables)
+                                    {
+                                        <option value="@ObtenerValor(resp, "id")">
+                                            @ObtenerValor(resp, "nombre")
+                                        </option>
+                                    }
+                                </select>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-primary" @onclick="AgregarResponsable">Agregar</button>
+                                </div>
+                            </div>
+                            <ul class="list-group">
+                                @foreach (var item in responsablesporindicador)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        @ObtenerValor(item,"fkidresponsable") - Nombre: @ObtenerValor(item,"nombre")
+                                        <button type="button" class="btn btn-sm btn-danger" @onclick="() => EliminarElementoLista(item,responsablesporindicador)">Remover</button>
+                                    </li>
+                                }
+                            </ul>
+                        </fieldset>
+                        <fieldset class="border p-2 mb-3">
+                            <legend>Fuentesporindicador</legend>
+                            <div class="mb-3 d-flex gap-2 justify-content-center" >
+                                <select class="form-select" @bind="@idFuenteAgregar">
+                                    <option value="">Seleccione una Fuente</option>
+                                    @foreach (var fuen in fuentes)
+                                    {
+                                        <option value="@ObtenerValor(fuen, "id")">
+                                            @ObtenerValor(fuen, "nombre")
+                                        </option>
+                                    }
+                                </select>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-primary" @onclick="AgregarFuente">Agregar</button>
+                                </div>
+                            </div>
+                            <ul class="list-group">
+                                @foreach (var item in fuentesporindicador)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        @ObtenerValor(item, "fkidfuente") - Nombre: @ObtenerValor(item, "nombre")
+                                        <button type="button" class="btn btn-sm btn-danger" @onclick="() => EliminarElementoLista(item,fuentesporindicador)">Remover</button>
+                                    </li>
+                                }
+                            </ul>
+                        </fieldset>
+                        <fieldset class="border p-2 mb-3">
+                            <legend>Variablesporindicador</legend>
+                            <div class="mb-3 d-flex gap-2 justify-content-center" >
+                                <div class="w-100 d-flex gap-2">
+                                    <select class="form-select" @bind="@idVariableAgregar">
+                                        <option value="">Seleccione una Variable</option>
+                                        @foreach (var vari in variables)
+                                        {
+                                            <option value="@ObtenerValor(vari, "id")">
+                                                @ObtenerValor(vari, "nombre")
+                                            </option>
+                                        }
+                                    </select>
+                                    <input type="number" placeholder="Dato" class="form-control" @bind="@datoVariableAgregar" />
+                                </div>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-primary" @onclick="AgregarVariable">Agregar</button>
+                                </div>
+                            </div>
+                            <ul class="list-group">
+                                @foreach (var item in variablesporindicador)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        @ObtenerValor(item,"fkidvariable") - Nombre: @ObtenerValor(item,"nombre") = @ObtenerValor(item,"dato")
+                                        <button type="button" class="btn btn-sm btn-danger" @onclick="() => EliminarElementoLista(item,variablesporindicador)">Remover</button>
+                                    </li>
+                                }
+                            </ul>
+                        </fieldset>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-primary" data-bs-target="#crearModal2" data-bs-toggle="modal">Anterior</button>
-                        <button class="btn btn-primary" data-bs-target="#" data-bs-toggle="modal">Guardar</button>
+                        <button class="btn btn-primary" @onclick="CrearIndicador">Guardar</button>
                     </div>
                 </div>
             </div>
@@ -419,6 +525,10 @@ else
     private List<Dictionary<string, object>> literales = new List<Dictionary<string, object>>();
     private List<Dictionary<string, object>> numerales = new List<Dictionary<string, object>>();
     private List<Dictionary<string, object>> paragrafos = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> represenvisual = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> responsables = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> fuentes = new List<Dictionary<string, object>>();
+    private List<Dictionary<string, object>> variables = new List<Dictionary<string, object>>();
 
     
     // Variable para almacenar el formulario
@@ -461,9 +571,121 @@ else
         public string fkidparagrafo { get; set; } = "";
     }
 
+
+    private string idRepresenIndicadorAgregar = "";
+
+    private void AgregarRepresenvisual()
+    {
+    bool yaExiste = represenvisualporindicador.Any(x =>
+        x.TryGetValue("fkidrepresenvisual", out var valor) &&
+        valor?.ToString() == idRepresenIndicadorAgregar);
+        var rep = represenvisual.FirstOrDefault(x => x.TryGetValue("id", out var id) && id?.ToString() == idRepresenIndicadorAgregar);
+        var nombre = rep != null && rep.TryGetValue("nombre", out var nombreObj) ? nombreObj?.ToString() ?? "" : "";
+
+        if (!string.IsNullOrWhiteSpace(idRepresenIndicadorAgregar) && !yaExiste)
+        {
+            represenvisualporindicador.Add(new Dictionary<string, object>
+            {
+                { "fkidrepresenvisual", idRepresenIndicadorAgregar },
+                { "nombre", nombre },
+            });
+
+            idRepresenIndicadorAgregar = "";
+        }
+    }
+
+    private string idResponsableAgregar = "";
+    private void AgregarResponsable()
+    {
+    bool yaExiste = responsablesporindicador.Any(x =>
+        x.TryGetValue("fkidresponsable", out var valor) &&
+        valor?.ToString() == idResponsableAgregar);
+        var rep = responsables.FirstOrDefault(x => x.TryGetValue("id", out var id) && id?.ToString() == idResponsableAgregar);
+        var nombre = rep != null && rep.TryGetValue("nombre", out var nombreObj) ? nombreObj?.ToString() ?? "" : "";
+
+        if (!string.IsNullOrWhiteSpace(idResponsableAgregar) && !yaExiste)
+        {
+            responsablesporindicador.Add(new Dictionary<string, object>
+            {
+                { "fkidresponsable", idResponsableAgregar },
+                { "nombre", nombre },
+            });
+
+            idResponsableAgregar = "";
+        }
+    }
+
+    private string idFuenteAgregar = "";
+    private void AgregarFuente()
+    {
+    bool yaExiste = fuentesporindicador.Any(x =>
+        x.TryGetValue("fkidfuente", out var valor) &&
+        valor?.ToString() == idFuenteAgregar);
+        var rep = fuentes.FirstOrDefault(x => x.TryGetValue("id", out var id) && id?.ToString() == idFuenteAgregar);
+        var nombre = rep != null && rep.TryGetValue("nombre", out var nombreObj) ? nombreObj?.ToString() ?? "" : "";
+
+        if (!string.IsNullOrWhiteSpace(idFuenteAgregar) && !yaExiste)
+        {
+            fuentesporindicador.Add(new Dictionary<string, object>
+            {
+                { "fkidfuente", idFuenteAgregar },
+                { "nombre", nombre },
+            });
+
+            idFuenteAgregar = "";
+        }
+    }
+
+    private string idVariableAgregar = "";
+    private string datoVariableAgregar = "";
+    private void AgregarVariable()
+    {
+    bool yaExiste = variablesporindicador.Any(x =>
+        x.TryGetValue("fkidvariable", out var valor) &&
+        valor?.ToString() == idVariableAgregar);
+        var rep = variables.FirstOrDefault(x => x.TryGetValue("id", out var id) && id?.ToString() == idVariableAgregar);
+        var nombre = rep != null && rep.TryGetValue("nombre", out var nombreObj) ? nombreObj?.ToString() ?? "" : "";
+        
+        if (!string.IsNullOrWhiteSpace(idVariableAgregar) && !yaExiste)
+        {
+            // Se quema el valor temporalmente
+            // Aquí puedes agregar la lógica para obtener el dato de la variable
+            var email = "admin@empresa.com";
+            variablesporindicador.Add(new Dictionary<string, object>
+            {
+                { "fkidvariable", idVariableAgregar },
+                { "dato", datoVariableAgregar },
+                { "fkemailusuario", email },
+                { "nombre", nombre }
+            });
+
+            idVariableAgregar = "";
+            datoVariableAgregar = "";
+        }
+    }
+
+    private void EliminarElementoLista(Dictionary<string, object> elemento, List<Dictionary<string, object>> lista)
+    {
+        // Eliminar el elemento de la lista
+        lista.Remove(elemento);
+    }
+
+    private void ReiniciarFormulariosIndicador(){
+        formularioIndicador = new FormularioIndicador();
+        represenvisual = new List<Dictionary<string, object>>();
+        responsables = new List<Dictionary<string, object>>();
+        fuentes = new List<Dictionary<string, object>>();
+        variables = new List<Dictionary<string, object>>();
+        represenvisualporindicador = new List<Dictionary<string, object>>();
+        responsablesporindicador = new List<Dictionary<string, object>>();
+        fuentesporindicador = new List<Dictionary<string, object>>();
+        variablesporindicador = new List<Dictionary<string, object>>();
+    }
+
+
     private async void ManejarClickCrear()
     {
-        formularioIndicador = new FormularioIndicador();
+        ReiniciarFormulariosIndicador();
         mensaje = null;
         await CargarTiposIndicador();
         await CargarUnidadesMedicion();
@@ -473,12 +695,17 @@ else
         await CargarLiterales();
         await CargarNumerales();
         await CargarParagrafos();
+        await CargarRepresenvisual();
+        await CargarResponsables();
+        await CargarFuentes();
+        await CargarVariables();
         StateHasChanged();
     }
 
     private async void ManejarClickListar()
     {
         mensaje = null;
+        ReiniciarFormulariosIndicador();
         await CargarIndicadores();
         StateHasChanged();
     }
@@ -522,6 +749,95 @@ else
             CargarTabla = true;
         }
     }
+
+    private async Task CrearIndicador(){
+        mensaje = null;
+
+        try
+        {
+            var parametros = new Dictionary<string, object>
+            {
+                { "codigo", formularioIndicador.codigo },
+                { "nombre", formularioIndicador.nombre },
+                { "objetivo", formularioIndicador.objetivo },
+                { "alcance", formularioIndicador.alcance },
+                { "formula", formularioIndicador.formula },
+                { "meta", formularioIndicador.meta },
+                { "fkidtipoindicador", formularioIndicador.fkidtipoindicador },
+                { "fkidunidadmedicion", formularioIndicador.fkidunidadmedicion },
+                { "fkidsentido", formularioIndicador.fkidsentido },
+                { "fkidfrecuencia", formularioIndicador.fkidfrecuencia },
+            };
+
+            if (!string.IsNullOrEmpty(formularioIndicador.fkidarticulo))
+            {
+                parametros.Add("fkidarticulo", formularioIndicador.fkidarticulo);
+            }
+            if (!string.IsNullOrEmpty(formularioIndicador.fkidliteral))
+            {
+                parametros.Add("fkidliteral", formularioIndicador.fkidliteral);
+            }
+            if (!string.IsNullOrEmpty(formularioIndicador.fkidnumeral))
+            {
+                parametros.Add("fkidnumeral", formularioIndicador.fkidnumeral);
+            }
+            if (!string.IsNullOrEmpty(formularioIndicador.fkidparagrafo))
+            {
+                parametros.Add("fkidparagrafo", formularioIndicador.fkidparagrafo);
+            }
+            if (represenvisualporindicador != null && represenvisualporindicador.Count > 0)
+            {
+                parametros.Add("represenvisualporindicador", represenvisualporindicador);
+            }
+            if (responsablesporindicador != null && responsablesporindicador.Count > 0)
+            {
+                parametros.Add("responsablesporindicador", responsablesporindicador);
+            }
+            if (fuentesporindicador != null && fuentesporindicador.Count > 0)
+            {
+                parametros.Add("fuentesporindicador", fuentesporindicador);
+            }
+            if (variablesporindicador != null && variablesporindicador.Count > 0)
+            {
+                parametros.Add("variablesporindicador", variablesporindicador);
+            }
+            
+
+            var resultado = await servicioEntidad.EjecutarProcedimientoAsync(
+            PROYECTO,
+            TABLA,
+            "insertar_indicador_intermedias",
+            parametros
+            );
+            if (resultado != null)
+            {
+                Console.WriteLine($"Resultado: {ObtenerValor(resultado[0], "Mensaje")}");
+                await CargarIndicadores();
+                mensaje = "Indicador creado con éxito";
+                return;
+            }
+            else
+            {
+                mensaje = "Error al guardar Indicador";
+            }
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine($"Error al guardar factura: {ex.Message}");
+            mensaje = $"Error al guardar Indicador: {ex.Message}";
+        }
+        finally
+        {
+            ReiniciarFormulariosIndicador();
+            await CerrarModal("crearModal3");
+        }
+    }
+
+    private async Task CerrarModal(string idModal)
+    {
+        await JS.InvokeVoidAsync("cerrarModalPorId", idModal);
+    }
+
 
     private async Task EliminarIndicador(string id)
     {
@@ -753,6 +1069,28 @@ else
         }
     }
 
+    private async Task CargarRepresenvisual()
+    {
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "represenvisual");
+            if (resultado != null)
+            {
+                represenvisual = resultado;
+            }
+            else
+            {
+                represenvisual = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Represenvisual: {ex.Message}";
+        }
+    }
+
     private async Task CargarRepresenvisualporindicador(string id)
     {
         mensaje = null;
@@ -778,6 +1116,28 @@ else
         finally
         {
             StateHasChanged();
+        }
+    }
+
+    private async Task CargarResponsables()
+    {
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "actor");
+            if (resultado != null)
+            {
+                responsables = resultado;
+            }
+            else
+            {
+                responsables = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Responsables: {ex.Message}";
         }
     }
 
@@ -807,6 +1167,28 @@ else
         }
     }
 
+    private async Task CargarFuentes()
+    {
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "fuente");
+            if (resultado != null)
+            {
+                fuentes = resultado;
+            }
+            else
+            {
+                fuentes = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Fuentes: {ex.Message}";
+        }
+    }
+
     private async Task CargarFuentesporindicador(string id)
     {
         mensaje = null;
@@ -830,6 +1212,28 @@ else
         finally
         {
             StateHasChanged();
+        }
+    }
+
+    private async Task CargarVariables()
+    {
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.ObtenerTodosAsync(PROYECTO, "variable");
+            if (resultado != null)
+            {
+                variables = resultado;
+            }
+            else
+            {
+                variables = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al cargar Variables: {ex.Message}";
         }
     }
 
