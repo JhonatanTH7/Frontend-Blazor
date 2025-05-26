@@ -1,1 +1,230 @@
 @page "/consulta1"
+
+@using Services
+
+@using FrontBlazor.Pages.Componentes
+
+<!--  Importa el espacio de nombres donde se encuentra el ServicioEntidad-->
+@inject ServicioEntidad servicioEntidad
+
+<PageTitle>Consulta1</PageTitle>
+
+<h1>Consulta 1</h1>
+
+
+<div class="mb-3 d-flex gap-2 justify-content-between align-items-center">
+    <div class="head-left-side d-flex gap-2">
+        <button class="btn btn-primary" @onclick="CargarIndicadores">Listar</button>
+        <button class="btn btn-primary" @onclick="() => CargarIndicadoresPorNombre()">Consultar</button>
+        <input type="text" class="form-control" id="iptConsultar" placeholder="Nombre Indicador"
+            @bind="nombreConsulta" />
+    </div>
+    <span style="font-size: small; width: 35%;">
+       <strong>Enunciado : </strong>Mostrar el listado de los campos de la tabla indicador, incluyendo el nombre del tipo, nombre del sentido y la descripción de la unidad de medición de cada indicador. 
+    </span>
+</div>
+
+@if (Cargando)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+
+    @if (CargarTabla && indicadores != null && indicadores.Count > 0)
+    {
+        <div class="table-responsive tableContainer ">
+            <table class="table table-striped text-center">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Codigo</th>
+                        <th>Nombre</th>
+                        <th>Objetivo</th>
+                        <th>Alcance</th>
+                        <th>Formula</th>
+                        <th>Meta</th>
+                        <th>FkIdTipoIndicador</th>
+                        <th>Nombre Tipo Indicador</th>
+                        <th>FkIdUnidadMedicion</th>
+                        <th>Descripcion Unidad Medicion</th>
+                        <th>FkIdSentido</th>
+                        <th>Nombre Sentido</th>
+                        <th>FkIdFrecuencia</th>
+                        <th>FkidArticulo</th>
+                        <th>FkIdLiteral</th>
+                        <th>FkIdNumeral</th>
+                        <th>FkIdParagrafo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var indicador in indicadores)
+                    {
+                        var id = ObtenerValor(indicador, "id");
+                        var codigo = ObtenerValor(indicador, "codigo");
+                        var nombre = ObtenerValor(indicador, "nombre");
+                        var objetivo = ObtenerValor(indicador, "objetivo");
+                        var alcance = ObtenerValor(indicador, "alcance");
+                        var formula = ObtenerValor(indicador, "formula");
+                        var meta = ObtenerValor(indicador, "meta");
+                        var fkidTipoIndicador = ObtenerValor(indicador, "fkidtipoindicador");
+                        var nombretipoindicador = ObtenerValor(indicador, "nombretipoindicador");
+                        var fkidUnidadMedicion = ObtenerValor(indicador, "fkidunidadmedicion");
+                        var descripcionunidadmedicion = ObtenerValor(indicador, "descripcionunidadmedicion");
+                        var fkidSentido = ObtenerValor(indicador, "fkidsentido");
+                        var nombresentido = ObtenerValor(indicador, "nombresentido");
+                        var fkidFrecuencia = ObtenerValor(indicador, "fkidfrecuencia");
+                        var fkidArticulo = ObtenerValor(indicador, "fkidarticulo");
+                        var fkidLiteral = ObtenerValor(indicador, "fkidliteral");
+                        var fkidNumeral = ObtenerValor(indicador, "fkidnumeral");
+                        var fkidParagrafo = ObtenerValor(indicador, "fkidparagrafo");
+                        <tr>
+                            <td>@id</td>
+                            <td>@codigo</td>
+                            <td>@nombre</td>
+                            <td>@objetivo</td>
+                            <td>@alcance</td>
+                            <td>@formula</td>
+                            <td>@meta</td>
+                            <td>@fkidTipoIndicador</td>
+                            <td>@nombretipoindicador</td>
+                            <td>@fkidUnidadMedicion</td>
+                            <td>@descripcionunidadmedicion</td>
+                            <td>@fkidSentido</td>
+                            <td>@nombresentido</td>
+                            <td>@fkidFrecuencia</td>
+                            <td>@fkidArticulo</td>
+                            <td>@fkidLiteral</td>
+                            <td>@fkidNumeral</td>
+                            <td>@fkidParagrafo</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if ((indicadores == null || indicadores.Count == 0) && CargarTabla)
+    {
+        <p>No hay resultados de indicadores disponibles.</p>
+    }
+
+}
+
+<!-- Mostrar mensaje de error si existe -->
+@if (mensaje != null)
+{
+    <div class="alert" id="mensajeContainer">
+        @mensaje
+    </div>
+}
+
+<style>
+    #mensajeContainer {
+        position: fixed !important;
+        top: 13%;
+        right: 35%;
+        z-index: 9999;
+        transition: opacity 0.5s ease-in-out;
+        background-color: rgba(255, 115, 0, 0.55);
+    }
+</style>
+
+@code {
+    private List<Dictionary<string, object>> indicadores = new List<Dictionary<string, object>>();
+    private const string PROYECTO = "proyecto";
+    private const string TABLA = "indicador";
+    private string nombreConsulta = string.Empty;
+    private bool Cargando = true;
+    private bool CargarTabla = false;
+    private string? mensaje = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarIndicadores();
+    }
+
+    private async Task CargarIndicadores()
+    {
+        Cargando = true;
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { {"consulta", "SELECT dbo.indicador.*, dbo.sentido.nombre AS nombresentido, dbo.tipoindicador.nombre AS nombretipoindicador, dbo.unidadmedicion.descripcion AS descripcionunidadmedicion FROM dbo.indicador INNER JOIN dbo.sentido ON dbo.indicador.fkidsentido = dbo.sentido.id INNER JOIN dbo.tipoindicador ON dbo.indicador.fkidtipoindicador = dbo.tipoindicador.id INNER JOIN dbo.unidadmedicion ON dbo.indicador.fkidunidadmedicion = dbo.unidadmedicion.id;" } });
+            if (resultado != null)
+            {
+                indicadores = resultado;
+            }
+            else
+            {
+                indicadores = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar indicadores: {ex.Message}");
+            MostrarMensaje("Error al cargar indicadores. Por favor, inténtelo de nuevo más tarde.");
+        }
+        finally
+        {
+            Cargando = false;
+            CargarTabla = true;
+        }
+    }
+
+    private async Task CargarIndicadoresPorNombre()
+    {
+        Cargando = true;
+        mensaje = null;
+
+        try
+        {
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", $"SELECT dbo.indicador.*, dbo.sentido.nombre AS nombresentido, dbo.tipoindicador.nombre AS nombretipoindicador, dbo.unidadmedicion.descripcion AS descripcionunidadmedicion FROM dbo.indicador INNER JOIN dbo.sentido ON dbo.indicador.fkidsentido = dbo.sentido.id INNER JOIN dbo.tipoindicador ON dbo.indicador.fkidtipoindicador = dbo.tipoindicador.id INNER JOIN dbo.unidadmedicion ON dbo.indicador.fkidunidadmedicion = dbo.unidadmedicion.id WHERE dbo.indicador.nombre LIKE '%{nombreConsulta}%'" } });
+            if (resultado != null)
+            {
+                indicadores = resultado;
+                nombreConsulta = string.Empty;
+            }
+            else
+            {
+                indicadores = new List<Dictionary<string, object>>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar indicadores por nombre: {ex.Message}");
+            MostrarMensaje("Error al cargar indicadores por nombre. Por favor, inténtelo de nuevo más tarde.");
+        }
+        finally
+        {
+            Cargando = false;
+            CargarTabla = true;
+        }
+    }
+
+    private void MostrarMensaje(string mensaje)
+    {
+        this.mensaje = mensaje;
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(5000);
+            this.mensaje = null;
+            await InvokeAsync(StateHasChanged);
+        });
+        StateHasChanged();
+    }
+
+    private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
+    {
+
+        if (diccionario == null)
+            return string.Empty;
+
+        if (diccionario.TryGetValue(clave, out var valor))
+        {
+            return valor?.ToString() ?? string.Empty;
+        }
+
+        return string.Empty;
+    }
+}

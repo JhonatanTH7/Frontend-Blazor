@@ -142,7 +142,6 @@ else
 </style>
 
 @code {
-
     private List<Dictionary<string, object>> indicadores = new List<Dictionary<string, object>>();
     private List<Dictionary<string, object>> listaporindicador = new List<Dictionary<string, object>>();
     
@@ -152,7 +151,6 @@ else
     private bool Cargando = true;
     private bool CargarTabla = false;
     private string? mensaje = null;
-
 
     [Parameter]
     public string Titulo { get; set; } = string.Empty;
@@ -166,7 +164,6 @@ else
     public bool BoolFuen { get; set; } = false;
     [Parameter]
     public bool BoolVari { get; set; } = false;
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -253,7 +250,7 @@ else
         }
     }
 
-  private async Task CargarResponsablesporindicador(string id)
+    private async Task CargarResponsablesporindicador(string id)
     {
         mensaje = null;
 

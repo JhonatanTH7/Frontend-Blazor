@@ -21,14 +21,14 @@
                             {
                                 if (item is Dictionary<string, object> dic)
                                 {
-                                    <li class="text-start">@ObtenerValor(dic, CampoPrimario)
+                                    <li class="text-start"> @CampoPrimario = @ObtenerValor(dic, CampoPrimario)
                                         @if (CampoSecundario != "null")
                                         {
-                                            <span> - @ObtenerValor(dic, CampoSecundario)</span>
+                                            <span> , @CampoSecundario = @ObtenerValor(dic, CampoSecundario)</span>
                                         }
                                         @if (CampoTerciario != "null")
                                         {
-                                            <span> - @ObtenerValor(dic, CampoTerciario)</span>
+                                            <span> , @CampoTerciario = @ObtenerValor(dic, CampoTerciario)</span>
                                         }
                                     </li>
                                 }
