@@ -27,7 +27,7 @@
             @bind="nombreConsulta" />
     </div>
 
-    <div class="head-right-side">
+    <div>
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#crearModal1" @onclick="ManejarClickCrear" >Crear</button>
         <div class="modal fade" id="crearModal1" aria-hidden="true" aria-labelledby="crearModal1Label" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -1563,7 +1563,7 @@ else
 
         try
         {
-            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", $"SELECT rv.id AS fkidrepresenvisual rv.nombre FROM dbo.represenvisualporindicador rvpi INNER JOIN dbo.represenvisual rv ON rv.id = rvpi.fkidrepresenvisual  WHERE rvpi.fkidindicador = {id}" } });
+            var resultado = await servicioEntidad.EjecutarConsultaAsync(PROYECTO, TABLA, new Dictionary<string, object> { { "consulta", $"SELECT rv.id AS fkidrepresenvisual, rv.nombre FROM dbo.represenvisualporindicador rvpi INNER JOIN dbo.represenvisual rv ON rv.id = rvpi.fkidrepresenvisual  WHERE rvpi.fkidindicador = {id}" } });
             if (resultado != null)
             {
                 represenvisualporindicador = resultado;   

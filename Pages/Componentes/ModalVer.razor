@@ -26,6 +26,10 @@
                                         {
                                             <span> - @ObtenerValor(dic, CampoSecundario)</span>
                                         }
+                                        @if (CampoTerciario != "null")
+                                        {
+                                            <span> - @ObtenerValor(dic, CampoTerciario)</span>
+                                        }
                                     </li>
                                 }
                             }
@@ -48,6 +52,7 @@
     [Parameter] public List<TItem>? Items { get; set; }
     [Parameter] public string CampoPrimario { get; set; } = "nombre";
     [Parameter] public string CampoSecundario { get; set; } = "null";
+    [Parameter] public string CampoTerciario { get; set; } = "null";
     [Parameter] public string Titulo { get; set; } = "Detalle";
     [Parameter] public string IdModal { get; set; } = "sharedModal";
     [Parameter] public EventCallback OnVerClick { get; set; }
