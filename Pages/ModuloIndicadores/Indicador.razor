@@ -8,6 +8,8 @@
 
 <!--  Importa el espacio de nombres donde se encuentra el ServicioEntidad-->
 @inject ServicioEntidad servicioEntidad
+
+
 @inject IJSRuntime JS
 
 <PageTitle>Indicador</PageTitle>
@@ -1143,9 +1145,8 @@ else
         }
     }
 
-    private async Task CrearIndicador(){
-        mensaje = null;
-
+    private async Task CrearIndicador()
+    {
         try
         {
             var parametros = new Dictionary<string, object>
@@ -1312,12 +1313,8 @@ else
 
     private async Task EliminarIndicador(string id)
     {
-
-        mensaje = null;
-
         try
         {
-
             var resultado = await servicioEntidad.EliminarAsync(PROYECTO, TABLA, "id", id);
 
             if (resultado)
@@ -1335,10 +1332,6 @@ else
         {
             Console.WriteLine($"Error al eliminar Indicador: {ex.Message}");
             MostrarMensaje("Error al eliminar Indicador");
-        }
-        finally
-        {
-            Cargando = false;
         }
     }
 
