@@ -1,4 +1,7 @@
-﻿<!-- Contenedor superior del menú de navegación -->
+﻿
+@inject FrontBlazor.Services.ServicioValidacionEstado servicioValidacionEstado
+@inject IJSRuntime JSRuntime
+<!-- Contenedor superior del menú de navegación -->
 <!-- top-row: define altura y posición, ps-3: padding izquierdo, navbar navbar-dark: estilos de Bootstrap para la barra de navegación oscura -->
 <div class="top-row ps-3 navbar navbar-dark">
     <!-- container-fluid: contenedor que ocupa todo el ancho disponible (Bootstrap) -->
@@ -19,6 +22,8 @@
 </div>
 
 <!-- Contenedor principal del menú de navegación -->
+
+
 <!-- @NavMenuCssClass: clase dinámica que controla si el menú está colapsado o no -->
 <!-- nav-scrollable: permite desplazamiento si el menú es muy largo -->
 <!-- @onclick: colapsa el menú al hacer clic en cualquier opción (en dispositivos móviles) -->
@@ -39,176 +44,177 @@
             </NavLink>
         </div>
 
-
-        <div class="nav-item px-3">
-            <div class="nav-link accordion text-center">
-                Modulo de Consultas
-                <span class="arrow">▼</span>
-            </div>
-            <div class="panel">
-                <div class=" nav-item px-3">
-                    <NavLink class="nav-link" href="consulta1">
-                        Consulta 1
-                    </NavLink>
+        @if (!string.IsNullOrEmpty(servicioValidacionEstado.CorreoUsuario))
+        {
+            <div class="nav-item px-3">
+                <div class="nav-link accordion text-center">
+                    Modulo de Consultas
+                    <span class="arrow">▼</span>
                 </div>
-                <div class=" nav-item px-3">
-                    <NavLink class="nav-link" href="consulta2">
-                        Consulta 2
-                    </NavLink>
-                </div>
-                <div class=" nav-item px-3">
-                    <NavLink class="nav-link" href="consulta3">
-                        Consulta 3
-                    </NavLink>
-                </div>
-                <div class=" nav-item px-3">
-                    <NavLink class="nav-link" href="consulta4">
-                        Consulta 4
-                    </NavLink>
-                </div>
-                <div class=" nav-item px-3">
-                    <NavLink class="nav-link" href="consulta5">
-                        Consulta 5
-                    </NavLink>
-                </div>
-                <div class=" nav-item px-3">
-                    <NavLink class="nav-link" href="consulta6">
-                        Consulta 6
-                    </NavLink>
-                </div>
-            </div>
-        </div>
-
-        <div class="nav-item px-3">
-            <div class="nav-link accordion text-center">Modulo de Indicadores <span class="arrow">▼</span></div>
-            <div class="panel">
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="indicador">
-                        Indicador
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="resultadoindicador">
-                        Resultado indicador
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="frecuencia">
-                        Frecuencia
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="tipoindicador">
-                        Tipo indicador
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="tipoactor">
-                        Tipo actor
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="sentido">
-                        Sentido
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="represenvisual">
-                        Represenvisual
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="fuente">
-                        Fuente
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="unidadmedicion">
-                        Unidad medición
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="actor">
-                        Actor
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="variable">
-                        Variable
-                    </NavLink>
+                <div class="panel">
+                    <div class=" nav-item px-3">
+                        <NavLink class="nav-link" href="consulta1">
+                            Consulta 1
+                        </NavLink>
+                    </div>
+                    <div class=" nav-item px-3">
+                        <NavLink class="nav-link" href="consulta2">
+                            Consulta 2
+                        </NavLink>
+                    </div>
+                    <div class=" nav-item px-3">
+                        <NavLink class="nav-link" href="consulta3">
+                            Consulta 3
+                        </NavLink>
+                    </div>
+                    <div class=" nav-item px-3">
+                        <NavLink class="nav-link" href="consulta4">
+                            Consulta 4
+                        </NavLink>
+                    </div>
+                    <div class=" nav-item px-3">
+                        <NavLink class="nav-link" href="consulta5">
+                            Consulta 5
+                        </NavLink>
+                    </div>
+                    <div class=" nav-item px-3">
+                        <NavLink class="nav-link" href="consulta6">
+                            Consulta 6
+                        </NavLink>
+                    </div>
                 </div>
             </div>
-        </div>
 
+            <div class="nav-item px-3">
+                <div class="nav-link accordion text-center">Modulo de Indicadores <span class="arrow">▼</span></div>
+                <div class="panel">
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="indicador">
+                            Indicador
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="resultadoindicador">
+                            Resultado indicador
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="frecuencia">
+                            Frecuencia
+                        </NavLink>
+                    </div>
 
-        <div class="nav-item px-3">
-            <div class="nav-link accordion text-center">
-                Modulo Legal
-                <span class="arrow">▼</span>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="tipoindicador">
+                            Tipo indicador
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="tipoactor">
+                            Tipo actor
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="sentido">
+                            Sentido
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="represenvisual">
+                            Represenvisual
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="fuente">
+                            Fuente
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="unidadmedicion">
+                            Unidad medición
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="actor">
+                            Actor
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="variable">
+                            Variable
+                        </NavLink>
+                    </div>
+                </div>
             </div>
-            <div class="panel">
-                <div class=" nav-item px-3">
-                    <NavLink class="nav-link" href="seccion">
-                        Sección
-                    </NavLink>
+
+
+            <div class="nav-item px-3">
+                <div class="nav-link accordion text-center">
+                    Modulo Legal
+                    <span class="arrow">▼</span>
                 </div>
+                <div class="panel">
+                    <div class=" nav-item px-3">
+                        <NavLink class="nav-link" href="seccion">
+                            Sección
+                        </NavLink>
+                    </div>
 
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="subseccion">
-                        Subsección
-                    </NavLink>
-                </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="subseccion">
+                            Subsección
+                        </NavLink>
+                    </div>
 
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="articulo">
-                        Articulo
-                    </NavLink>
-                </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="articulo">
+                            Articulo
+                        </NavLink>
+                    </div>
 
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="paragrafo">
-                        Paragrafo
-                    </NavLink>
-                </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="paragrafo">
+                            Paragrafo
+                        </NavLink>
+                    </div>
 
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="literal">
-                        Literal
-                    </NavLink>
-                </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="literal">
+                            Literal
+                        </NavLink>
+                    </div>
 
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="numeral">
-                        Numeral
-                    </NavLink>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="nav-item px-3">
-            <div class="nav-link accordion text-center">Modulo de Usuarios <span class="arrow">▼</span></div>
-            <div class="panel">
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="rol">
-                        Rol
-                    </NavLink>
-                </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="usuario">
-                        Usuario
-                    </NavLink>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="numeral">
+                            Numeral
+                        </NavLink>
+                    </div>
                 </div>
             </div>
-        </div>
 
+
+            <div class="nav-item px-3">
+                <div class="nav-link accordion text-center">Modulo de Usuarios <span class="arrow">▼</span></div>
+                <div class="panel">
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="rol">
+                            Rol
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="usuario">
+                            Usuario
+                        </NavLink>
+                    </div>
+                </div>
+            </div>
+        }
 
     </nav>
 </div>
@@ -236,7 +242,7 @@
         transform: rotate(180deg);
     }
 </style>
-
+@* 
 <script>
     var acc = document.getElementsByClassName("accordion");
     var i;
@@ -261,7 +267,7 @@
             }
         });
     }
-</script>
+</script> *@
 
 <!-- Bloque de código C# que define la lógica del componente -->
 @code {
@@ -278,5 +284,28 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+    protected override void OnInitialized()
+    {
+        // Suscribirse al evento OnChange del servicio para que, cada vez que el estado de autenticación cambie
+        // (ej. al iniciar o cerrar sesión), el componente NavMenu se re-renderice.
+        servicioValidacionEstado.OnChange += StateHasChanged;
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Solo ejecuta la función JS si el usuario está logueado
+        // y, por lo tanto, los elementos del acordeón están presentes en el DOM.
+        if (!string.IsNullOrEmpty(servicioValidacionEstado.CorreoUsuario))
+        {
+            // Llama a la función JavaScript global para inicializar los acordeones
+            await JSRuntime.InvokeVoidAsync("initializeAccordions");
+        }
+    }
+
+    public void Dispose()
+    {
+
+        servicioValidacionEstado.OnChange -= StateHasChanged;
     }
 }

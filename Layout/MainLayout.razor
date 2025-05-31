@@ -3,6 +3,9 @@
 <!-- Proporciona la propiedad Body para insertar el contenido de la página actual -->
 @inherits LayoutComponentBase
 
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavManager
+@inject FrontBlazor.Services.ServicioValidacionEstado servicioValidacionEstado
 <!-- Contenedor principal que envuelve toda la página -->
 <div class="page">
     <!-- Panel lateral (sidebar) que contiene el menú de navegación -->
@@ -16,8 +19,26 @@
     <main>
         <!-- Barra superior con padding horizontal (px-4) -->
         <div class="top-row px-4">
-            <!-- Enlace "About" que abre la documentación oficial de ASP.NET Core en una nueva pestaña -->
-            <a href="/home">About</a>
+            <!-- Crea el menu desplegable de inicio de sesión en la parte superior -->
+            @if (!string.IsNullOrEmpty(servicioValidacionEstado.CorreoUsuario))
+            {
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <span>Bienvenido, @servicioValidacionEstado.CorreoUsuario</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                        <li><a class="dropdown-item" href="#">Perfil (próximamente)</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><button class="dropdown-item" @onclick="CerrarSesion">Cerrar Sesión</button></li>
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <a class="btn btn-primary" href="/login">Iniciar Sesión</a>
+            }
+            <!-- <a href="/home">About</a>  -->
         </div>
 
         <!-- Contenedor del contenido principal con padding horizontal (px-4) -->
@@ -28,3 +49,32 @@
         </article>
     </main>
 </div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // Carga el correo del usuario cuando el MainLayout se inicializa
+        // (esto sucede una vez en la primera carga de la app o si se refresca la página completa)
+        await servicioValidacionEstado.LoadCorreoUsuario();
+    }
+protected override void OnInitialized()
+    {
+        // Suscríbete al evento OnChange del servicio para que, cada vez que el estado cambie (ej. login/logout),
+        // se llame a StateHasChanged() y el MainLayout se re-renderice con el nuevo correo.
+        servicioValidacionEstado.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        // Es crucial desuscribirse para evitar fugas de memoria, aunque MainLayout rara vez se desecha.
+        servicioValidacionEstado.OnChange -= StateHasChanged;
+    }
+
+    private async Task CerrarSesion()
+    {
+        // Delega la lógica de limpieza al servicio
+        await servicioValidacionEstado.ClearSession();
+        // Redirige al usuario a la página de login, forzando una recarga completa
+        NavManager.NavigateTo("/login", true);
+    }
+}

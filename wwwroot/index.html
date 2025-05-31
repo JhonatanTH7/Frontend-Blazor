@@ -55,15 +55,15 @@
       <!-- Botón para descartar la notificación de error -->
       <a class="dismiss">🗙</a>
     </div>
-    <!-- Script principal de Blazor WebAssembly que inicializa la aplicación -->
-    <!-- Este script descarga y ejecuta el runtime de .NET WebAssembly y la aplicación compilada -->
-    <script src="_framework/blazor.webassembly.js"></script>
-    <script src="js/splash.js"></script>
+
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
       crossorigin="anonymous"
     ></script>
+
+    <script src="js/acordeon.js"></script>
+
     <script>
       window.cerrarModalPorId = (idModal) => {
         const modalElement = document.getElementById(idModal);
@@ -74,6 +74,12 @@
           }
         }
       };
+
+    
     </script>
+    <script src="js/roles.js"></script>
+        <!-- Script principal de Blazor WebAssembly que inicializa la aplicación -->
+    <!-- Este script descarga y ejecuta el runtime de .NET WebAssembly y la aplicación compilada -->
+    <script src="_framework/blazor.webassembly.js"></script>
   </body>
 </html>

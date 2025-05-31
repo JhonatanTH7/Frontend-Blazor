@@ -5,7 +5,7 @@
 @inject IJSRuntime JSRuntime 
 @inherits FrontBlazor.Services.ValidacionAcceso
 
-
+@inject FrontBlazor.Services.ServicioValidacionEstado ServicioValidacionEstado
 <!-- Sección de diseño de la página de login -->
 <section class="vh-100">
   <div class="container-fluid h-custom">
@@ -87,7 +87,7 @@
                 { "valorContrasena", modeloLogin.Contrasena }         // Capturar el valor de la contraseña ingresada
             };
 
-            // Realizar una solicitud POST al backend para verificar si el usuario y la contraseña son correctos
+
             var respuestaVerificar = await Http.PostAsJsonAsync(
                 "http://localhost:5178/api/proyecto/usuario/verificar-contrasena", // URL del endpoint de verificación
                 datosVerificar                                                    // Cuerpo de la solicitud
@@ -122,6 +122,7 @@
                     // Leer la respuesta como una lista de diccionarios
                     var listaRoles = await respuestaRoles.Content.ReadFromJsonAsync<List<Dictionary<string, object>>>();
 
+                    await ServicioValidacionEstado.SetUserSession(modeloLogin.Correo);
                     // Validar que existan roles asociados
                     if (listaRoles != null && listaRoles.Any())
                     {

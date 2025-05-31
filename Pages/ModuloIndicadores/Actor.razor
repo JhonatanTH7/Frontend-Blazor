@@ -22,8 +22,15 @@
     </div>
 
     <div class="head-right-side">
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#crearModel">Crear</button>
-
+        <button id="crear" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#crearModel">Crear</button>
+        <script>
+            const rol_Validador = sessionStorage.getItem('rol_Validador');
+            const button = document.getElementById('crear');
+                if (rol_Validador === 'Validador') {
+                    button.disabled = true;
+                    button.style.display = 'none';
+                }
+        </script>
         <div class="modal fade" id="crearModel" tabindex="-1" aria-labelledby="crearModelLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -75,6 +82,7 @@
         </div>
     </div>
 
+
 </div>
 
 
@@ -98,6 +106,7 @@ else
                     </tr>
                 </thead>
                 <tbody>
+
                     @foreach (var actor in actores)
                     {
                             var idActor = ObtenerValor(actor, "idActor");
@@ -109,7 +118,7 @@ else
                             <td>@ObtenerValor(actor, "nombreActor")</td>
                             <td>@ObtenerValor(actor, "nombreTipoActor")</td>
                             <td>
-                                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="@($"#{nombreActor.Replace(" ", "")}{idActor}Modal")"
+                                <button class="btn btn-warning editar-btn" data-bs-toggle="modal" data-bs-target="@($"#{nombreActor.Replace(" ", "")}{idActor}Modal")"
                                     @onclick="@(async () => {
                                         formularioActor.id = idActor;
                                         formularioActor.nombre = nombreActor;
@@ -118,6 +127,8 @@ else
                                     })">
                                     Editar
                                 </button>
+                                
+                                                                
 
                                 <div class="modal fade" id="@($"{nombreActor.Replace(" ", "")}{idActor}Modal")" tabindex="-1"
                                     aria-labelledby="@($"{nombreActor.Replace(" ", "")}{idActor}ModalLabel")" aria-hidden="true">
@@ -171,8 +182,12 @@ else
                             </td>
                         </tr>
                     }
+                    
+
                 </tbody>
+                
             </table>
+            <!-- El control de permisos de los botones de edición se realiza ahora vía JS interop en OnAfterRenderAsync -->
         </div>
     }
     else if ((actores == null || actores.Count == 0) && CargarTabla)
@@ -189,8 +204,6 @@ else
         @mensaje
     </div>
 }
-
-
 
 @code {
 
@@ -215,12 +228,17 @@ else
     private bool Cargando = true;
     private bool CargarTabla = false;
 
+    // Método que se ejecuta al inicializar el componente
+
+    // Controla si se debe ejecutar el script de permisos
     protected override async Task OnInitializedAsync()
     {
         await CargarTiposActor();
         await CargarActores();
+        
+        
     }
-
+    
     private class FormularioActor
     {
         public string id { get; set; } = "";
@@ -232,11 +250,13 @@ else
     {
         mensaje = null;
         await CargarActores();
+
         StateHasChanged();
     }
 
     private async void ManejarClickEliminar(string id)
     {
+        
         mensaje = null;
         var confirmar = await JS.InvokeAsync<bool>("confirm", "¿Está seguro de que desea eliminar este Actor?");
         if (!confirmar)
@@ -442,5 +462,6 @@ else
 
         return string.Empty;
     }
+
 
 }
